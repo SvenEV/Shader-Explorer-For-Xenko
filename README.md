@@ -3,5 +3,5 @@ A quick and dirty tool showing the [built-in shaders](http://doc.xenko.com/lates
 
 <img src="XenkoShaderExplorer/Assets/Screenshot.png" alt="Screenshot" width="700px"/>
 
-# Build & Run
+## Build & Run
 Build with Visual Studio 2015 or newer.
