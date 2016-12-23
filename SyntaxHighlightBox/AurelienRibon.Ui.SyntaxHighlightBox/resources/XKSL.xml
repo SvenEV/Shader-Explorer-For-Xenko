@@ -1,0 +1,98 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+
+<Syntax name="XKSL">
+  <HighlightWordsRule name="Reserved language words">
+    <Words>
+      shader stage cbuffer abs attribute case constant if else elsif for
+      not null params return stream streams while static const internal
+      override var compose namespace nointerpolation base rgroup typedef
+      switch default struct in out inout using
+    </Words>
+    <IgnoreCase>false</IgnoreCase>
+    <Foreground>#0000FF</Foreground>
+    <FontWeight>Normal</FontWeight>
+    <FontStyle>Normal</FontStyle>
+  </HighlightWordsRule>
+
+  <HighlightWordsRule name="Standard types">
+    <Words>
+      void bool
+      int int2 int2x2 int3 int3x3 int4 int4x4
+      uint uint2 uint2x2 uint3 uint3x3 uint4 uint4x4
+      fixed fixed2 fixed2x2 fixed3 fixed3x3 fixed4 fixed4x4
+      float float2 float2x2 float3 float3x3 float4 float4x4
+    </Words>
+    <IgnoreCase>false</IgnoreCase>
+    <Foreground>#0000FF</Foreground>
+    <FontWeight>Normal</FontWeight>
+    <FontStyle>Normal</FontStyle>
+  </HighlightWordsRule>
+
+  <HighlightWordsRule name="More types">
+    <Words>
+      Color Texture Texture2D Texture3D TextureCube SamplerState
+    </Words>
+    <IgnoreCase>false</IgnoreCase>
+    <Foreground>#2B91AF</Foreground>
+    <FontWeight>Normal</FontWeight>
+    <FontStyle>Normal</FontStyle>
+  </HighlightWordsRule>
+
+  <HighlightWordsRule name="Semantics">
+    <Words>
+      POSITION
+      POSITIONH
+      POSITION_WS
+      DEPTH_VS
+      NORMAL
+      NORMAL_WS
+      NORMALWS
+      TANGENT
+      COLOR
+      TEXCOORD0
+      TEXCOORD1
+      TEXCOORD2
+      TEXCOORD3
+      TEXCOORD4
+      TEXCOORD5
+      TEXCOORD6
+      TEXCOORD7
+      TEXCOORD8
+      TEXCOORD9
+      Z_DEPTH_VALUE
+      BATCH_LIFETIME
+      BATCH_RANDOMSEED
+    </Words>
+    <IgnoreCase>false</IgnoreCase>
+    <Foreground>#999999</Foreground>
+    <FontWeight>Normal</FontWeight>
+    <FontStyle>Normal</FontStyle>
+  </HighlightWordsRule>
+
+  <HighlightWordsRule name="Standard functions">
+    <Words>
+      min max abs sin cos lerp frac fmod floor ceil dot cross mul
+      saturate smoothstep normalize pow exp
+    </Words>
+    <IgnoreCase>false</IgnoreCase>
+    <Foreground>#000000</Foreground>
+    <FontWeight>Bold</FontWeight>
+    <FontStyle>Normal</FontStyle>
+  </HighlightWordsRule>
+
+  <HighlightLineRule name="Comments">
+    <LineStart>//</LineStart>
+    <IgnoreCase>false</IgnoreCase>
+    <Foreground>#009933</Foreground>
+    <FontWeight>Normal</FontWeight>
+    <FontStyle>Normal</FontStyle>
+  </HighlightLineRule>
+
+  <AdvancedHighlightRule name="Numbers">
+    <Expression>\b([0-9]*\.?[0-9]+f?)\b</Expression>
+    <IgnoreCase>false</IgnoreCase>
+    <Foreground>#F68A1B</Foreground>
+    <FontWeight>Normal</FontWeight>
+    <FontStyle>Normal</FontStyle>
+  </AdvancedHighlightRule>
+</Syntax>

@@ -1,0 +1,10 @@
+﻿<Window x:Class="Test.MainWindow" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+		xmlns:cbox="clr-namespace:AurelienRibon.Ui.SyntaxHighlightBox;assembly=AurelienRibon.Ui.SyntaxHighlightBox"
+		xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" Title="CodeBox Example" Height="500"
+		Width="600">
+	
+	<Grid>
+		<cbox:SyntaxHighlightBox IsLineNumbersMarginVisible="True" x:Name="box" />
+	</Grid>
+	
+</Window>
