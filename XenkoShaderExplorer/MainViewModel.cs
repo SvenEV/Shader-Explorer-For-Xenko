@@ -12,7 +12,8 @@ namespace XenkoShaderExplorer
     public class MainViewModel : ViewModelBase
     {
         private string _filterText;
-        private string _path = @"C:\Program Files\Silicon Studio\Xenko\GamePackages\Xenko.1.9.2-beta";
+		private string BASE_PATH = @"C:/Program Files/Silicon Studio/Xenko/GamePackages/";
+		private string _path;
 
         /// <summary>
         /// The list of roots of the tree view. This includes all the shaders
@@ -64,7 +65,16 @@ namespace XenkoShaderExplorer
         {
             try
             {
-                RootShaders = BuildShaderTree().ToList();
+				_path = Directory
+					.EnumerateDirectories(BASE_PATH)
+					.First(s => 
+						System.IO.Path
+							.GetFileName(s)
+							.ToUpper()
+							.StartsWith("XENKO")
+					);
+					
+				RootShaders = BuildShaderTree().ToList();
             }
             catch (Exception e)
             {
@@ -105,7 +115,7 @@ namespace XenkoShaderExplorer
 
         private IEnumerable<Shader> BuildShaderTree()
         {
-            var files = Directory.GetFiles(_path, "*.xksl", SearchOption.AllDirectories);
+            var files = Directory.GetFiles(Path, "*.xksl", SearchOption.AllDirectories);
             var shaders = new Dictionary<string, Shader>();
 
             foreach (var file in files)
@@ -116,8 +126,13 @@ namespace XenkoShaderExplorer
 
             foreach (var shader in shaders.Values)
             {
-                var text = File.ReadAllLines(shader.Path)
-                    .FirstOrDefault(s => s.Trim().StartsWith("shader"));
+				var stop = false;
+				var text = string.Join(" ",
+								File.ReadAllLines(shader.Path)
+									.SkipWhile(s => !s.Trim().StartsWith("shader")) //From shader
+									.TakeWhile(s => !s.Contains("{")) // To the bracket (exclusive)
+						); 
+						
 
                 if (text != null)
                 {
@@ -132,16 +147,25 @@ namespace XenkoShaderExplorer
                         var baseShaderNames = baseShaderDeclaration
                             .Split(',')
                             .Select(s => s.Trim());
+						if (!baseShaderNames.Contains("ShadowMapCasterBase")) { //I have no clue why this shader doesn't exist. >w>
 
-                        foreach (var baseShader in baseShaderNames.Select(s => shaders[s]))
-                        {
-                            shader.BaseShaders.Add(baseShader);
-                            baseShader.DerivedShaders.Add(shader);
-                        }
+							try
+							{
+								foreach (var baseShader in baseShaderNames.Select(s => shaders[s]))
+								{
+									shader.BaseShaders.Add(baseShader);
+									baseShader.DerivedShaders.Add(shader);
+								}
+							}
+							catch (Exception e)
+							{
+								Console.Write(baseShaderNames);
+							}
+						}
                     }
                 }
             }
-
+			var x = 3;
             foreach (var rootShader in shaders.Values.Where(o => !o.BaseShaders.Any()))
             {
                 yield return rootShader;
