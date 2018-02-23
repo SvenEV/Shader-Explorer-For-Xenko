@@ -149,23 +149,18 @@ namespace XenkoShaderExplorer
                             .Select(s => s.Trim());
 						if (!baseShaderNames.Contains("ShadowMapCasterBase")) { //I have no clue why this shader doesn't exist. >w>
 
-							try
+
+							foreach (var baseShader in baseShaderNames.Select(s => shaders[s]))
 							{
-								foreach (var baseShader in baseShaderNames.Select(s => shaders[s]))
-								{
-									shader.BaseShaders.Add(baseShader);
-									baseShader.DerivedShaders.Add(shader);
-								}
+								shader.BaseShaders.Add(baseShader);
+								baseShader.DerivedShaders.Add(shader);
 							}
-							catch (Exception e)
-							{
-								Console.Write(baseShaderNames);
-							}
+
 						}
                     }
                 }
             }
-			var x = 3;
+
             foreach (var rootShader in shaders.Values.Where(o => !o.BaseShaders.Any()))
             {
                 yield return rootShader;
