@@ -1,7 +1,6 @@
 ﻿using GalaSoft.MvvmLight;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -11,7 +10,8 @@ namespace XenkoShaderExplorer
 {
     public class MainViewModel : ViewModelBase
     {
-        private const string BasePath = @"C:/Program Files/Silicon Studio/Xenko/GamePackages/";
+        private const string XenkoEnvironmentVariable = "SiliconStudioXenkoDir";
+        private const string FallbackBasePath = @"C:\Program Files\Silicon Studio\Xenko\";
 
         private string _filterText;
         private string _path;
@@ -66,14 +66,13 @@ namespace XenkoShaderExplorer
         {
             try
             {
+                var xenkoDir = Environment.GetEnvironmentVariable(XenkoEnvironmentVariable) ?? FallbackBasePath;
+                var basePath = System.IO.Path.Combine(xenkoDir, "GamePackages");
+
                 _path = Directory
-                    .EnumerateDirectories(BasePath)
-                    .First(s =>
-                        System.IO.Path
-                            .GetFileName(s)
-                            .ToUpper()
-                            .StartsWith("XENKO")
-                    );
+                    .EnumerateDirectories(basePath)
+                    .First(s => System.IO.Path.GetFileName(s)
+                        .StartsWith("XENKO", StringComparison.OrdinalIgnoreCase));
 
                 RootShaders = BuildShaderTree().ToList();
             }
