@@ -1,7 +1,6 @@
 ﻿using GalaSoft.MvvmLight;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -11,9 +10,11 @@ namespace XenkoShaderExplorer
 {
     public class MainViewModel : ViewModelBase
     {
+        private const string XenkoEnvironmentVariable = "SiliconStudioXenkoDir";
+        private const string FallbackBasePath = @"C:\Program Files\Silicon Studio\Xenko\";
+
         private string _filterText;
-		private string BASE_PATH = @"C:/Program Files/Silicon Studio/Xenko/GamePackages/";
-		private string _path;
+        private string _path;
 
         /// <summary>
         /// The list of roots of the tree view. This includes all the shaders
@@ -65,20 +66,19 @@ namespace XenkoShaderExplorer
         {
             try
             {
-				_path = Directory
-					.EnumerateDirectories(BASE_PATH)
-					.First(s => 
-						System.IO.Path
-							.GetFileName(s)
-							.ToUpper()
-							.StartsWith("XENKO")
-					);
-					
-				RootShaders = BuildShaderTree().ToList();
+                var xenkoDir = Environment.GetEnvironmentVariable(XenkoEnvironmentVariable) ?? FallbackBasePath;
+                var basePath = System.IO.Path.Combine(xenkoDir, "GamePackages");
+
+                _path = Directory
+                    .EnumerateDirectories(basePath)
+                    .First(s => System.IO.Path.GetFileName(s)
+                        .StartsWith("XENKO", StringComparison.OrdinalIgnoreCase));
+
+                RootShaders = BuildShaderTree().ToList();
             }
             catch (Exception e)
             {
-                Debug.WriteLine(e);
+                MessageBox.Show(e.ToString(), "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -126,21 +126,17 @@ namespace XenkoShaderExplorer
 
             foreach (var shader in shaders.Values)
             {
-				var stop = false;
-				var text = string.Join(" ",
-								File.ReadAllLines(shader.Path)
-									.SkipWhile(s => !s.Trim().StartsWith("shader")) //From shader
-									.TakeWhile(s => !s.Contains("{")) // To the bracket (exclusive)
-						); 
-						
+                var declaration = string.Join(" ", File.ReadAllLines(shader.Path)
+                    .SkipWhile(s => !s.Trim().StartsWith("shader")) // From "shader"
+                    .TakeWhile(s => !s.Contains("{"))); // To the bracket (exclusive)
 
-                if (text != null)
+                if (declaration != null)
                 {
-                    var colonIndex = text.IndexOf(':');
+                    var colonIndex = declaration.IndexOf(':');
 
                     if (colonIndex != -1)
                     {
-                        var baseShaderDeclaration = text.Substring(colonIndex + 1);
+                        var baseShaderDeclaration = declaration.Substring(colonIndex + 1);
                         baseShaderDeclaration = Regex.Replace(baseShaderDeclaration, @"\<[\w\s\.\,]*\>", "");
                         baseShaderDeclaration = Regex.Replace(baseShaderDeclaration, "//.*", "");
 
@@ -149,14 +145,17 @@ namespace XenkoShaderExplorer
                             .Select(s => s.Trim());
 						if (!baseShaderNames.Contains("ShadowMapCasterBase")) { //I have no clue why this shader doesn't exist. >w>
 
+                        // There are shaders deriving from "ShadowMapCasterBase" which for some reason doesn't exit,
+                        // so this base shader is filtered out via TryGetValue(...) == false.
+                        var baseShaders = baseShaderNames
+                            .Select(s => shaders.TryGetValue(s, out var b) ? b : null)
+                            .Where(s => s != null);
 
-							foreach (var baseShader in baseShaderNames.Select(s => shaders[s]))
-							{
-								shader.BaseShaders.Add(baseShader);
-								baseShader.DerivedShaders.Add(shader);
-							}
-
-						}
+                        foreach (var baseShader in baseShaders)
+                        {
+                            shader.BaseShaders.Add(baseShader);
+                            baseShader.DerivedShaders.Add(shader);
+                        }
                     }
                 }
             }
