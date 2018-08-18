@@ -1,5 +1,6 @@
 ﻿using AurelienRibon.Ui.SyntaxHighlightBox;
 using System.IO;
+using System.Reflection;
 using System.Windows;
 
 namespace XenkoShaderExplorer
@@ -12,7 +13,7 @@ namespace XenkoShaderExplorer
         {
             InitializeComponent();
             DataContext = ViewModel;
-
+            this.Header.Text = "Shader Explorer for Xenko " + Assembly.GetEntryAssembly().GetName().Version;
             codeView.CurrentHighlighter = HighlighterManager.Instance.Highlighters["XKSL"];
         }
 

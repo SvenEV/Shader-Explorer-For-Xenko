@@ -20,7 +20,7 @@
         <Border Grid.Row="0">
             <StackPanel Margin="8">
                 <StackPanel Orientation="Horizontal">
-                    <TextBlock Text="Shader Explorer for Xenko" Foreground="White" Margin="0,0,0,4"
+                    <TextBlock Name="Header" Text="Shader Explorer for Xenko" Foreground="White" Margin="0,0,0,4"
                                FontSize="18" FontFamily="Segoe UI Light"/>
                     <TextBox Text="{Binding Path, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Delay=1000}"
                              ToolTip="Enter the path to a Xenko installation"
