@@ -9,12 +9,11 @@
         Foreground="White"
         Title="Info" Height="200" Width="300"
         ResizeMode="NoResize">
-    
     <Border Background="#FF434343" Padding="12">
         <Grid>
             <StackPanel>
 
-                <TextBlock Text="Shader Explorer for Xenko"
+                <TextBlock Name="InfoHeaderBlock" Text="{Binding InfoHeader}"
                            FontWeight="SemiBold"/>
             
                 <TextBlock Text="This program uses open source software:" Margin="0,12,0,4"/>
