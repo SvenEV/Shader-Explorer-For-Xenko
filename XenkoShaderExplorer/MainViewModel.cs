@@ -10,7 +10,7 @@ namespace XenkoShaderExplorer
 {
     public class MainViewModel : ViewModelBase
     {
-        private const string XenkoEnvironmentVariable = "SiliconStudioXenkoDir";
+        private const string XenkoEnvironmentVariable = "XenkoDir";
         private const string FallbackBasePath = @"C:\Program Files\Silicon Studio\Xenko\";
 
         private string _filterText;
@@ -66,13 +66,14 @@ namespace XenkoShaderExplorer
         {
             try
             {
-                var xenkoDir = Environment.GetEnvironmentVariable(XenkoEnvironmentVariable) ?? FallbackBasePath;
-                var basePath = System.IO.Path.Combine(xenkoDir, "GamePackages");
+                var userDir = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+                var xenkoDir = System.IO.Path.Combine(userDir, ".nuget", "packages", "xenko");
+                var directories = Directory.GetDirectories(xenkoDir)
+                    .Where(folder => !folder.EndsWith("-dev")) //exclude local build package
+                    .OrderBy(folder => folder, StringComparer.OrdinalIgnoreCase);
+                var basePath = directories.LastOrDefault();
 
-                _path = Directory
-                    .EnumerateDirectories(basePath)
-                    .First(s => System.IO.Path.GetFileName(s)
-                        .StartsWith("XENKO", StringComparison.OrdinalIgnoreCase));
+                _path = basePath;
 
                 RootShaders = BuildShaderTree().ToList();
             }
@@ -126,8 +127,8 @@ namespace XenkoShaderExplorer
 
             foreach (var shader in shaders.Values)
             {
-                var declaration = string.Join(" ", File.ReadAllLines(shader.Path)
-                    .SkipWhile(s => !s.Trim().StartsWith("shader")) // From "shader"
+                var declaration = string.Join(" ", File.ReadLines(shader.Path)
+                    .SkipWhile(s => !s.Trim().StartsWith("shader") && !s.Trim().StartsWith("class")) // From "shader" or "class"
                     .TakeWhile(s => !s.Contains("{"))); // To the bracket (exclusive)
 
                 if (declaration != null)
@@ -143,26 +144,26 @@ namespace XenkoShaderExplorer
                         var baseShaderNames = baseShaderDeclaration
                             .Split(',')
                             .Select(s => s.Trim());
-						if (!baseShaderNames.Contains("ShadowMapCasterBase")) { //I have no clue why this shader doesn't exist. >w>
+                        System.Diagnostics.Debug.WriteLine(string.Join(", ", baseShaderNames));
+                        //if (!baseShaderNames.Contains("ShadowMapCasterBase"))
+                        { //I have no clue why this shader doesn't exist. >w>
 
-                        // There are shaders deriving from "ShadowMapCasterBase" which for some reason doesn't exit,
-                        // so this base shader is filtered out via TryGetValue(...) == false.
-                        var baseShaders = baseShaderNames
-                            .Select(s => shaders.TryGetValue(s, out var b) ? b : null)
-                            .Where(s => s != null);
+                            // There are shaders deriving from "ShadowMapCasterBase" which for some reason doesn't exit,
+                            // so this base shader is filtered out via TryGetValue(...) == false.
+                            var baseShaders = baseShaderNames
+                                .Select(s => shaders.TryGetValue(s, out var b) ? b : null)
+                                .Where(s => s != null);
 
-                        foreach (var baseShader in baseShaders)
-                        {
-                            shader.BaseShaders.Add(baseShader);
-                            baseShader.DerivedShaders.Add(shader);
+                            foreach (var baseShader in baseShaders)
+                            {
+                                shader.BaseShaders.Add(baseShader);
+                                baseShader.DerivedShaders.Add(shader);
+                            }
                         }
                     }
+                    else
+                        yield return shader;
                 }
-            }
-
-            foreach (var rootShader in shaders.Values.Where(o => !o.BaseShaders.Any()))
-            {
-                yield return rootShader;
             }
         }
     }
