@@ -3,7 +3,7 @@
 <Syntax name="XKSL">
   <HighlightWordsRule name="Reserved language words">
     <Words>
-      shader stage cbuffer abs attribute case constant if else elsif for
+      shader class stage cbuffer abs attribute case constant if else elsif for
       not null params return stream streams while static const internal
       override var compose namespace nointerpolation base rgroup typedef
       switch default struct in out inout using

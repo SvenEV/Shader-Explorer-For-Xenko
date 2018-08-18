@@ -128,7 +128,7 @@ namespace XenkoShaderExplorer
             foreach (var shader in shaders.Values)
             {
                 var declaration = string.Join(" ", File.ReadLines(shader.Path)
-                    .SkipWhile(s => !s.Trim().StartsWith("shader") && !s.Trim().StartsWith("class")) // From "shader" or "class"
+                    .SkipWhile(s => !s.Trim().Contains("shader ") && !s.Trim().Contains("class ")) // From "shader" or "class"
                     .TakeWhile(s => !s.Contains("{"))); // To the bracket (exclusive)
 
                 if (declaration != null)
