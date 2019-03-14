@@ -1,5 +1,7 @@
 ﻿using AurelienRibon.Ui.SyntaxHighlightBox;
+using System;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Windows;
 
@@ -13,8 +15,17 @@ namespace XenkoShaderExplorer
         {
             InitializeComponent();
             DataContext = ViewModel;
-            this.Header.Text = "Shader Explorer for Xenko " + Assembly.GetEntryAssembly().GetName().Version;
+            Title = "Shader Explorer for Xenko " + Assembly.GetEntryAssembly().GetName().Version;
             codeView.CurrentHighlighter = HighlighterManager.Instance.Highlighters["XKSL"];
+            XenkoDirMode.ItemsSource = Enum.GetValues(typeof(XenkoSourceDirMode)).Cast<XenkoSourceDirMode>();
+            XenkoDirMode.SelectedIndex = 0;
+            XenkoDirMode.SelectionChanged += XenkoDirMode_SelectionChanged;
+        }
+
+        private void XenkoDirMode_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
+        {
+            ViewModel.XenkoDirMode = (XenkoSourceDirMode)XenkoDirMode.SelectedIndex;
+            ViewModel.Refresh();
         }
 
         private void TreeView_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)

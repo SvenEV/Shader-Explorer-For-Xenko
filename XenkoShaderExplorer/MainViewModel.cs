@@ -1,6 +1,7 @@
 ﻿using GalaSoft.MvvmLight;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -8,13 +9,19 @@ using System.Windows;
 
 namespace XenkoShaderExplorer
 {
+    public enum XenkoSourceDirMode
+    {
+        Official,
+        Dev
+    }
+
     public class MainViewModel : ViewModelBase
     {
         private const string XenkoEnvironmentVariable = "XenkoDir";
         private const string FallbackBasePath = @"C:\Program Files\Silicon Studio\Xenko\";
 
         private string _filterText;
-        private string _path;
+        private IReadOnlyList<string> _path;
 
         /// <summary>
         /// The list of roots of the tree view. This includes all the shaders
@@ -37,10 +44,42 @@ namespace XenkoShaderExplorer
             }
         }
 
+        internal void Refresh()
+        {
+            try
+            {
+                List<string> basePath = null;
+                switch (XenkoDirMode)
+                {
+                    case XenkoSourceDirMode.Official:
+                        var userDir = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+                        var nugetPackageDir = Path.Combine(userDir, ".nuget", "packages");
+                        var directories = Directory.GetDirectories(nugetPackageDir) //package dir
+                            .Where(dir => Path.GetFileName(dir).StartsWith("xenko", StringComparison.OrdinalIgnoreCase)) //xenko folders
+                            .Select(dir => Directory.GetDirectories(dir).OrderBy(subdir => subdir, StringComparer.OrdinalIgnoreCase).LastOrDefault()) //latest version
+                            .Where(dir => !dir.EndsWith("-dev")); //exclude local build package
+                        basePath = directories.ToList();
+                        break;
+                    case XenkoSourceDirMode.Dev:
+                        basePath = new List<string> { Environment.GetEnvironmentVariable(XenkoEnvironmentVariable) ?? FallbackBasePath };
+                        //basePath = System.IO.Path.Combine(basePath, "sources", "engine", "Xenko.Engine", "Rendering");
+                        break;
+                    default:
+                        break;
+                }
+
+                Paths = basePath;
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show(e.ToString(), "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
         /// <summary>
         /// Path to the Xenko installation folder.
         /// </summary>
-        public string Path
+        public IReadOnlyList<string> Paths
         {
             get { return _path; }
             set
@@ -49,10 +88,11 @@ namespace XenkoShaderExplorer
                 {
                     try
                     {
-                        RootShaders = BuildShaderTree().ToList();
+                        RootShaders = BuildShaderTree().OrderBy(s => s.Name, StringComparer.OrdinalIgnoreCase).ToList();
                         RaisePropertyChanged(nameof(RootShaders));
                         RaisePropertyChanged(nameof(AllShaders));
                         UpdateFiltering();
+                        ExpandAll(false);
                     }
                     catch (Exception e)
                     {
@@ -62,25 +102,11 @@ namespace XenkoShaderExplorer
             }
         }
 
+        public XenkoSourceDirMode XenkoDirMode { get; internal set; }
+
         public MainViewModel()
         {
-            try
-            {
-                var userDir = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
-                var xenkoDir = System.IO.Path.Combine(userDir, ".nuget", "packages", "xenko");
-                var directories = Directory.GetDirectories(xenkoDir)
-                    .Where(folder => !folder.EndsWith("-dev")) //exclude local build package
-                    .OrderBy(folder => folder, StringComparer.OrdinalIgnoreCase);
-                var basePath = directories.LastOrDefault();
-
-                _path = basePath;
-
-                RootShaders = BuildShaderTree().ToList();
-            }
-            catch (Exception e)
-            {
-                MessageBox.Show(e.ToString(), "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
+            Refresh();
         }
 
         private void UpdateFiltering()
@@ -116,13 +142,14 @@ namespace XenkoShaderExplorer
 
         private IEnumerable<Shader> BuildShaderTree()
         {
-            var files = Directory.GetFiles(Path, "*.xksl", SearchOption.AllDirectories);
+            var files = Paths.SelectMany(path => Directory.GetFiles(path, "*.xksl", SearchOption.AllDirectories));
             var shaders = new Dictionary<string, Shader>();
 
             foreach (var file in files)
             {
                 var name = System.IO.Path.GetFileNameWithoutExtension(file);
-                shaders.Add(name, new Shader { Path = file, Name = name });
+                if(!shaders.ContainsKey(name))
+                    shaders[name] = new Shader { Path = file, Name = name };
             }
 
             foreach (var shader in shaders.Values)
@@ -145,7 +172,7 @@ namespace XenkoShaderExplorer
                             .Split(',')
                             .Select(s => s.Trim());
                         System.Diagnostics.Debug.WriteLine(string.Join(", ", baseShaderNames));
-                        //if (!baseShaderNames.Contains("ShadowMapCasterBase"))
+                        if (!baseShaderNames.Contains("ShadowMapCasterBase"))
                         { //I have no clue why this shader doesn't exist. >w>
 
                             // There are shaders deriving from "ShadowMapCasterBase" which for some reason doesn't exit,
@@ -165,6 +192,8 @@ namespace XenkoShaderExplorer
                         yield return shader;
                 }
             }
+
+            Debug.WriteLine($"Found {shaders.Count} shaders");
         }
     }
 }
