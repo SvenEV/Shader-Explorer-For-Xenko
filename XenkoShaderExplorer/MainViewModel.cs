@@ -18,6 +18,7 @@ namespace XenkoShaderExplorer
     public class MainViewModel : ViewModelBase
     {
         private const string XenkoEnvironmentVariable = "XenkoDir";
+        private const string NugetEnvironmentVariable = "NUGET_PACKAGES";
         private const string FallbackBasePath = @"C:\Program Files\Silicon Studio\Xenko\";
 
         private string _filterText;
@@ -44,6 +45,20 @@ namespace XenkoShaderExplorer
             }
         }
 
+        private string ResolveNugetPackageDir()
+        {
+            var nugetPackageDir = Environment.GetEnvironmentVariable(NugetEnvironmentVariable);
+            if (nugetPackageDir != null)
+            {
+                return nugetPackageDir;
+            }
+            else
+            {
+                var userDir = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+                return Path.Combine(userDir, ".nuget", "packages");
+            }
+        }
+
         internal void Refresh()
         {
             try
@@ -52,8 +67,7 @@ namespace XenkoShaderExplorer
                 switch (XenkoDirMode)
                 {
                     case XenkoSourceDirMode.Official:
-                        var userDir = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
-                        var nugetPackageDir = Path.Combine(userDir, ".nuget", "packages");
+                        var nugetPackageDir = ResolveNugetPackageDir();
                         var directories = Directory.GetDirectories(nugetPackageDir) //package dir
                             .Where(dir => Path.GetFileName(dir).StartsWith("xenko", StringComparison.OrdinalIgnoreCase)) //xenko folders
                             .Select(dir => Directory.GetDirectories(dir).OrderBy(subdir => subdir, StringComparer.OrdinalIgnoreCase).LastOrDefault()) //latest version
