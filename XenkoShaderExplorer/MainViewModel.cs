@@ -70,8 +70,8 @@ namespace XenkoShaderExplorer
                         var nugetPackageDir = ResolveNugetPackageDir();
                         var directories = Directory.GetDirectories(nugetPackageDir) //package dir
                             .Where(dir => Path.GetFileName(dir).StartsWith("xenko", StringComparison.OrdinalIgnoreCase)) //xenko folders
-                            .Select(dir => Directory.GetDirectories(dir).OrderBy(subdir => subdir, StringComparer.OrdinalIgnoreCase).LastOrDefault()) //latest version
-                            .Where(dir => !dir.EndsWith("-dev")); //exclude local build package
+                            .Select(dir => Directory.GetDirectories(dir).Where(subdir => !subdir.EndsWith("-dev")) //exclude local build package
+                            .OrderBy(subdir2 => subdir2, StringComparer.OrdinalIgnoreCase).LastOrDefault()); //latest version
                         basePath = directories.ToList();
                         break;
                     case XenkoSourceDirMode.Dev:
