@@ -5,7 +5,7 @@ using System.Linq;
 using System.Reflection;
 using System.Windows;
 
-namespace XenkoShaderExplorer
+namespace StrideShaderExplorer
 {
     public partial class MainWindow : Window
     {
@@ -15,16 +15,16 @@ namespace XenkoShaderExplorer
         {
             InitializeComponent();
             DataContext = ViewModel;
-            Title = "Shader Explorer for Xenko " + Assembly.GetEntryAssembly().GetName().Version;
+            Title = "Shader Explorer for Stride " + Assembly.GetEntryAssembly().GetName().Version;
             codeView.CurrentHighlighter = HighlighterManager.Instance.Highlighters["XKSL"];
-            XenkoDirMode.ItemsSource = Enum.GetValues(typeof(XenkoSourceDirMode)).Cast<XenkoSourceDirMode>();
-            XenkoDirMode.SelectedIndex = 0;
-            XenkoDirMode.SelectionChanged += XenkoDirMode_SelectionChanged;
+            StrideDirMode.ItemsSource = Enum.GetValues(typeof(StrideSourceDirMode)).Cast<StrideSourceDirMode>();
+            StrideDirMode.SelectedIndex = 0;
+            StrideDirMode.SelectionChanged += StrideDirMode_SelectionChanged;
         }
 
-        private void XenkoDirMode_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
+        private void StrideDirMode_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
         {
-            ViewModel.XenkoDirMode = (XenkoSourceDirMode)XenkoDirMode.SelectedIndex;
+            ViewModel.StrideDirMode = (StrideSourceDirMode)StrideDirMode.SelectedIndex;
             ViewModel.Refresh();
         }
 

@@ -7,9 +7,9 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Windows;
 
-namespace XenkoShaderExplorer
+namespace StrideShaderExplorer
 {
-    public enum XenkoSourceDirMode
+    public enum StrideSourceDirMode
     {
         Official,
         Dev
@@ -17,9 +17,8 @@ namespace XenkoShaderExplorer
 
     public class MainViewModel : ViewModelBase
     {
-        private const string XenkoEnvironmentVariable = "XenkoDir";
+        private const string StrideEnvironmentVariable = "StrideDir";
         private const string NugetEnvironmentVariable = "NUGET_PACKAGES";
-        private const string FallbackBasePath = @"C:\Program Files\Silicon Studio\Xenko\";
 
         private string _filterText;
         private IReadOnlyList<string> _path;
@@ -64,19 +63,32 @@ namespace XenkoShaderExplorer
             try
             {
                 List<string> basePath = null;
-                switch (XenkoDirMode)
+                switch (StrideDirMode)
                 {
-                    case XenkoSourceDirMode.Official:
+                    case StrideSourceDirMode.Official:
                         var nugetPackageDir = ResolveNugetPackageDir();
                         var directories = Directory.GetDirectories(nugetPackageDir) //package dir
-                            .Where(dir => Path.GetFileName(dir).StartsWith("xenko", StringComparison.OrdinalIgnoreCase)) //xenko folders
+                            .Where(dir => Path.GetFileName(dir).StartsWith("stride", StringComparison.OrdinalIgnoreCase)) //stride folders
                             .Select(dir => Directory.GetDirectories(dir).Where(subdir => !subdir.EndsWith("-dev")) //exclude local build package
                             .OrderBy(subdir2 => subdir2, StringComparer.OrdinalIgnoreCase).LastOrDefault()); //latest version
                         basePath = directories.ToList();
                         break;
-                    case XenkoSourceDirMode.Dev:
-                        basePath = new List<string> { Environment.GetEnvironmentVariable(XenkoEnvironmentVariable) ?? FallbackBasePath };
-                        //basePath = System.IO.Path.Combine(basePath, "sources", "engine", "Xenko.Engine", "Rendering");
+                    case StrideSourceDirMode.Dev:
+                        var strideDir = Environment.GetEnvironmentVariable(StrideEnvironmentVariable);
+                        if (strideDir != null)
+                        {
+                            basePath = new List<string> { strideDir };
+                        }
+                        else
+                        {
+                            var dialog = new System.Windows.Forms.FolderBrowserDialog();
+                            dialog.Description = "\"StrideDir\" environment variable not found. Select source repo main folder manually.";
+                            if (dialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+                            {
+                                basePath = new List<string> { dialog.SelectedPath };
+                            }
+                            //basePath = System.IO.Path.Combine(basePath, "sources", "engine", "Stride.Engine", "Rendering");
+                        }
                         break;
                     default:
                         break;
@@ -91,7 +103,7 @@ namespace XenkoShaderExplorer
         }
 
         /// <summary>
-        /// Path to the Xenko installation folder.
+        /// Path to the Stride installation folder.
         /// </summary>
         public IReadOnlyList<string> Paths
         {
@@ -116,7 +128,7 @@ namespace XenkoShaderExplorer
             }
         }
 
-        public XenkoSourceDirMode XenkoDirMode { get; internal set; }
+        public StrideSourceDirMode StrideDirMode { get; internal set; }
 
         public MainViewModel()
         {
@@ -156,7 +168,7 @@ namespace XenkoShaderExplorer
 
         private IEnumerable<Shader> BuildShaderTree()
         {
-            var files = Paths.SelectMany(path => Directory.GetFiles(path, "*.xksl", SearchOption.AllDirectories));
+            var files = Paths.SelectMany(path => Directory.GetFiles(path, "*.sdsl", SearchOption.AllDirectories));
             var shaders = new Dictionary<string, Shader>();
 
             foreach (var file in files)

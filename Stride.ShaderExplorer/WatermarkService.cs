@@ -9,7 +9,7 @@ using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Media;
 
-namespace XenkoShaderExplorer
+namespace StrideShaderExplorer
 {
     // Taken from http://stackoverflow.com/a/836463
 
