@@ -69,6 +69,7 @@ namespace StrideShaderExplorer
                         var nugetPackageDir = ResolveNugetPackageDir();
                         var directories = Directory.GetDirectories(nugetPackageDir) //package dir
                             .Where(dir => Path.GetFileName(dir).StartsWith("stride", StringComparison.OrdinalIgnoreCase)) //stride folders
+                            .Where(dir => Directory.EnumerateFileSystemEntries(dir).Any())
                             .Select(dir => Directory.GetDirectories(dir).Where(subdir => !subdir.EndsWith("-dev")) //exclude local build package
                             .OrderBy(subdir2 => subdir2, StringComparer.OrdinalIgnoreCase).LastOrDefault()); //latest version
                         basePath = directories.ToList();
@@ -168,7 +169,8 @@ namespace StrideShaderExplorer
 
         private IEnumerable<Shader> BuildShaderTree()
         {
-            var files = Paths.SelectMany(path => Directory.GetFiles(path, "*.sdsl", SearchOption.AllDirectories));
+            var files = Paths.Where(p => p != null && Directory.Exists(p))
+                .SelectMany(path => Directory.GetFiles(path, "*.sdsl", SearchOption.AllDirectories));
             var shaders = new Dictionary<string, Shader>();
 
             foreach (var file in files)
