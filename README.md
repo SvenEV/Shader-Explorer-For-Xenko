@@ -3,5 +3,7 @@ A quick and dirty tool showing the [built-in shaders](https://doc.stride3d.net/l
 
 <img src="Stride.ShaderExplorer/Assets/Screenshot.png" alt="Screenshot" width="700px"/>
 
+Download [here](https://github.com/tebjan/Stride.ShaderExplorer/releases/).
+
 ## Build & Run
 Build with Visual Studio 2015 or newer.
