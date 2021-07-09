@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 
-namespace XenkoShaderExplorer
+namespace StrideShaderExplorer
 {
     public class Shader : ObservableObject
     {

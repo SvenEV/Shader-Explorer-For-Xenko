@@ -2,7 +2,7 @@
 using System.Windows;
 using System.Windows.Documents;
 
-namespace XenkoShaderExplorer
+namespace StrideShaderExplorer
 {
     // Taken from http://stackoverflow.com/a/11433814
     public static class HyperlinkExtensions
