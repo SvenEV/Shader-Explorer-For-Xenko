@@ -1,0 +1,134 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+
+<Syntax name="SDSL">
+  <HighlightWordsRule name="Reserved language words">
+    <Words>
+      shader class stage cbuffer abs attribute case constant if else elsif for
+      not null params return stream streams while static const internal
+      override var mixin macro compose namespace nointerpolation base rgroup typedef
+      switch default struct in out inout using export
+    </Words>
+    <IgnoreCase>false</IgnoreCase>
+    <Foreground>#0000FF</Foreground>
+    <FontWeight>Normal</FontWeight>
+    <FontStyle>Normal</FontStyle>
+  </HighlightWordsRule>
+
+  <HighlightWordsRule name="Standard types">
+    <Words>
+      void bool
+      int int2 int2x2 int3 int3x3 int4 int4x4
+      uint uint2 uint2x2 uint3 uint3x3 uint4 uint4x4
+      fixed fixed2 fixed2x2 fixed3 fixed3x3 fixed4 fixed4x4
+      float float2 float2x2 float3 float3x3 float4 float4x4
+    </Words>
+    <IgnoreCase>false</IgnoreCase>
+    <Foreground>#0000FF</Foreground>
+    <FontWeight>Normal</FontWeight>
+    <FontStyle>Normal</FontStyle>
+  </HighlightWordsRule>
+
+  <HighlightWordsRule name="More types">
+    <Words>
+      Color SamplerState SamplerComparisonState
+      Texture1D Texture1DArray Texture2D Texture2DArray Texture2DMS Texture2DMSArray
+      Texture3D TextureCube TextureCubeArray
+      RWTexture1D RWTexture2D RWTexture2DArray RWTexture3D
+      texture texture1D texture2D texture3D
+      Buffer ByteAddressBuffer ConsumeStructuredBuffer StructuredBuffer
+      AppendStructuredBuffer RWBuffer RWByteAddressBuffer RWStructuredBuffer
+      const row_major column_major
+      point line triangle lineadj triangleadj
+      InputPatch OutputPatch
+      PointStream LineStream TriangleStream
+    </Words>
+    <IgnoreCase>false</IgnoreCase>
+    <Foreground>#2B91AF</Foreground>
+    <FontWeight>Normal</FontWeight>
+    <FontStyle>Normal</FontStyle>
+  </HighlightWordsRule>
+
+  <HighlightWordsRule name="Semantics">
+    <Words>
+      POSITION
+      POSITIONH
+      POSITION_WS
+      DEPTH_VS
+      NORMAL
+      NORMAL_WS
+      NORMALWS
+      TANGENT
+      COLOR
+      TEXCOORD0
+      TEXCOORD1
+      TEXCOORD2
+      TEXCOORD3
+      TEXCOORD4
+      TEXCOORD5
+      TEXCOORD6
+      TEXCOORD7
+      TEXCOORD8
+      TEXCOORD9
+      Z_DEPTH_VALUE
+      BATCH_LIFETIME
+      BATCH_RANDOMSEED
+      SV_Position SV_InstanceID SV_PrimitiveID SV_VertexID
+      SV_DomainLocation SV_InsideTessFactor SV_OutputControlPointID SV_TessFactor
+      SV_GSInstanceID SV_RenderTargetArrayIndex
+      SV_Coverage SV_Depth SV_IsFrontFace SV_SampleIndex SV_DepthGreater SV_DepthLessEqual VFACE
+      SV_Target SV_Target0 SV_Target1 SV_Target2 SV_Target3 SV_Target4 SV_Target5 SV_Target6 SV_Target7
+      SV_DispatchThreadID SV_GroupID SV_GroupIndex SV_GroupThreadID
+    </Words>
+    <IgnoreCase>false</IgnoreCase>
+    <Foreground>#7777AA</Foreground>
+    <FontWeight>Normal</FontWeight>
+    <FontStyle>Normal</FontStyle>
+  </HighlightWordsRule>
+
+  <HighlightWordsRule name="Standard functions">
+    <Words>
+      abs acos acosh asin asinh atan atanh cos cosh exp exp2 floor log log10 log2 round rsqrt sin sincos sinh sqrt tan tanh trunc
+      AllMemoryBarrier AllMemoryBarrierWithGroupSync DeviceMemoryBarrier DeviceMemoryBarrierWithGroupSync GroupMemoryBarrier GroupMemoryBarrierWithGroupSync
+      abort clip errorf printf
+      all any countbits faceforward firstbithigh firstbitlow isfinite isinf isnan max min noise pow reversebits sign
+      asdouble asfloat asint asuint D3DCOLORtoUBYTE4 f16tof32 f32tof16
+      ceil clamp degrees fma fmod frac frexp ldexp lerp mad modf radiants saturate smoothstep step
+      cross determinant distance dot dst length lit msad4 mul normalize rcp reflect refract transpose
+      ddx ddx_coarse ddx_fine ddy ddy_coarse ddy_fine fwidth
+      EvaluateAttributeAtCentroid EvaluateAttributeAtSample EvaluateAttributeSnapped
+      GetRenderTargetSampleCount GetRenderTargetSamplePosition
+      InterlockedAdd InterlockedAnd InterlockedCompareExchange InterlockedCompareStore InterlockedExchange InterlockedMax InterlockedMin InterlockedOr InterlockedXor
+      Process2DQuadTessFactorsAvg Process2DQuadTessFactorsMax Process2DQuadTessFactorsMin ProcessIsolineTessFactors
+      ProcessQuadTessFactorsAvg ProcessQuadTessFactorsMax ProcessQuadTessFactorsMin ProcessTriTessFactorsAvg ProcessTriTessFactorsMax ProcessTriTessFactorsMin
+      tex1D tex1Dbias tex1Dgrad tex1Dlod tex1Dproj
+      tex2D tex2Dbias tex2Dgrad tex2Dlod tex2Dproj
+      tex3D tex3Dbias tex3Dgrad tex3Dlod tex3Dproj
+      texCUBE texCUBEbias texCUBEgrad texCUBElod texCUBEproj
+      RestartStrip
+      CalculateLevelOfDetail CalculateLevelOfDetailUnclamped Gather GetDimensions GetSamplePosition Load Sample SampleBias SampleCmp SampleCmpLevelZero SampleGrad SampleLevel
+      Append Consume DecrementCounter IncrementCounter
+      Load2 Load3 Load4 Store Store2 Store3 Store4
+      GatherRed GatherGreen GatherBlue GatherAlpha GatherCmp GatherCmpRed GatherCmpGreen GatherCmpBlue GatherCmpAlpha
+    </Words>
+    <IgnoreCase>false</IgnoreCase>
+    <Foreground>#000000</Foreground>
+    <FontWeight>Bold</FontWeight>
+    <FontStyle>Normal</FontStyle>
+  </HighlightWordsRule>
+
+  <HighlightLineRule name="Comments">
+    <LineStart>//</LineStart>
+    <IgnoreCase>false</IgnoreCase>
+    <Foreground>#009933</Foreground>
+    <FontWeight>Normal</FontWeight>
+    <FontStyle>Normal</FontStyle>
+  </HighlightLineRule>
+
+  <AdvancedHighlightRule name="Numbers">
+    <Expression>\b([0-9]*\.?[0-9]+f?)\b</Expression>
+    <IgnoreCase>false</IgnoreCase>
+    <Foreground>#F68A1B</Foreground>
+    <FontWeight>Normal</FontWeight>
+    <FontStyle>Normal</FontStyle>
+  </AdvancedHighlightRule>
+</Syntax>

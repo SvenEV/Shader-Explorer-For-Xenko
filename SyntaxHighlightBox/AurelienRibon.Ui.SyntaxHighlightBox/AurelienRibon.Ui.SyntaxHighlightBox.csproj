@@ -66,8 +66,7 @@
     <Resource Include="resources\syntax.xsd" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="resources\XKSL.xml">
-      <SubType>Designer</SubType>
+    <Resource Include="resources\SDSL.xml">
     </Resource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
