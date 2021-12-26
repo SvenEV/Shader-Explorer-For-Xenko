@@ -6,6 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Windows;
+using System.Xml.Serialization;
 
 namespace StrideShaderExplorer
 {
@@ -21,7 +22,13 @@ namespace StrideShaderExplorer
         private const string NugetEnvironmentVariable = "NUGET_PACKAGES";
 
         private string _filterText;
-        private IReadOnlyList<string> _path;
+        private IReadOnlyList<string> _paths;
+
+        public List<string> AdditionalPaths
+        {
+            get;
+            set;
+        }
 
         /// <summary>
         /// The list of roots of the tree view. This includes all the shaders
@@ -62,7 +69,7 @@ namespace StrideShaderExplorer
         {
             try
             {
-                List<string> basePath = null;
+                List<string> paths = null;
                 switch (StrideDirMode)
                 {
                     case StrideSourceDirMode.Official:
@@ -72,13 +79,13 @@ namespace StrideShaderExplorer
                             .Where(dir => Directory.EnumerateFileSystemEntries(dir).Any())
                             .Select(dir => Directory.GetDirectories(dir).Where(subdir => !subdir.EndsWith("-dev")) //exclude local build package
                             .OrderBy(subdir2 => subdir2, StringComparer.OrdinalIgnoreCase).LastOrDefault()); //latest version
-                        basePath = directories.ToList();
+                        paths = directories.ToList();
                         break;
                     case StrideSourceDirMode.Dev:
                         var strideDir = Environment.GetEnvironmentVariable(StrideEnvironmentVariable);
                         if (strideDir != null)
                         {
-                            basePath = new List<string> { strideDir };
+                            paths = new List<string> { strideDir };
                         }
                         else
                         {
@@ -86,7 +93,7 @@ namespace StrideShaderExplorer
                             dialog.Description = "\"StrideDir\" environment variable not found. Select source repo main folder manually.";
                             if (dialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
                             {
-                                basePath = new List<string> { dialog.SelectedPath };
+                                paths = new List<string> { dialog.SelectedPath };
                             }
                             //basePath = System.IO.Path.Combine(basePath, "sources", "engine", "Stride.Engine", "Rendering");
                         }
@@ -95,7 +102,9 @@ namespace StrideShaderExplorer
                         break;
                 }
 
-                Paths = basePath;
+                paths.AddRange(AdditionalPaths);
+
+                Paths = paths;
             }
             catch (Exception e)
             {
@@ -103,15 +112,21 @@ namespace StrideShaderExplorer
             }
         }
 
+        internal void SaveUserSetting()
+        {
+            Properties.UserSettings.Default.AdditionalPaths = string.Join(";", AdditionalPaths);
+            Properties.UserSettings.Default.Save();
+        }
+
         /// <summary>
         /// Path to the Stride installation folder.
         /// </summary>
         public IReadOnlyList<string> Paths
         {
-            get { return _path; }
+            get { return _paths; }
             set
             {
-                if (Set(ref _path, value))
+                if (Set(ref _paths, value))
                 {
                     try
                     {
@@ -133,6 +148,7 @@ namespace StrideShaderExplorer
 
         public MainViewModel()
         {
+            AdditionalPaths = Properties.UserSettings.Default.AdditionalPaths.Split(';').ToList();
             Refresh();
         }
 

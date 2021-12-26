@@ -50,5 +50,19 @@ namespace StrideShaderExplorer
         {
             new InfoWindow().ShowDialog();
         }
+
+        private void OnAddDirsButtonClick(object sender, RoutedEventArgs e)
+        {
+            var pw = new AdditionalPathsWindow();
+            pw.DataContext = ViewModel;
+            pw.ShowDialog();
+            ViewModel.Refresh();
+        }
+
+        protected override void OnClosed(EventArgs e)
+        {
+            ViewModel.SaveUserSetting();
+            base.OnClosed(e);
+        }
     }
 }

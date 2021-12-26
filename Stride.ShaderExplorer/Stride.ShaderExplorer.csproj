@@ -8,10 +8,10 @@
     <AssemblyName>Stride.ShaderExplorer</AssemblyName>
     <OutputType>WinExe</OutputType>
     <UseWPF>true</UseWPF>
-    <StrideIsExecutable>true</StrideIsExecutable>
+    <!--<StrideIsExecutable>true</StrideIsExecutable>-->
     <PlatformTarget>x64</PlatformTarget>
     <RuntimeIdentifier>win-x64</RuntimeIdentifier>
-    <Version>1.0.1</Version>
+    <Version>1.1.0</Version>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -27,7 +27,7 @@
     <PackageReference Include="CommonServiceLocator" Version="2.0.6" />
     <PackageReference Include="MvvmLightLibs" Version="5.4.1.1" />
     <PackageReference Include="Stride.Engine" Version="4.0.1.1428" />
-    <PackageReference Include="Stride.Core.Assets.CompilerApp" Version="4.0.1.1428" IncludeAssets="build;buildTransitive" />
+    <!--<PackageReference Include="Stride.Core.Assets.CompilerApp" Version="4.0.1.1428" IncludeAssets="build;buildTransitive" />-->
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\SyntaxHighlightBox\AurelienRibon.Ui.SyntaxHighlightBox\AurelienRibon.Ui.SyntaxHighlightBox.csproj" />
@@ -44,18 +44,30 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <Compile Update="Properties\Settings.Designer.cs">
+    <Compile Update="Properties\UserSettings.Designer.cs">
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <AutoGen>True</AutoGen>
-      <DependentUpon>Settings.settings</DependentUpon>
+      <DependentUpon>UserSettings.settings</DependentUpon>
     </Compile>
     <Compile Update="**\*.xaml.cs" SubType="Code" DependentUpon="%(Filename)" />
   </ItemGroup>
   <ItemGroup>
-    <None Update="Properties\Settings.settings">
-      <Generator>SettingsSingleFileGenerator</Generator>
-      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
-    </None>
+    <Compile Update="AdditionalPathsWindow.xaml.cs">
+      <DependentUpon>AdditionalPathsWindow.xaml</DependentUpon>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
     <EmbeddedResource Update="Properties\Resources.resx" Generator="ResXFileCodeGenerator" LastGenOutput="Resources.Designer.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Update="Properties\UserSettings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>UserSettings.Designer.cs</LastGenOutput>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="AdditionalPathsWindow.xaml">
+      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
+    </Page>
   </ItemGroup>
 </Project>

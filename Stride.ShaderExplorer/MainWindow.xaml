@@ -22,8 +22,9 @@
                 <StackPanel Orientation="Horizontal">
                     <Button Content="Expand all" Click="OnExpandAllButtonClick"/>
                     <Button Content="Collapse all" Margin="4,0,0,0" Click="OnCollapseAllButtonClick"/>
-                    <Button Content="Info" Margin="4,0,0,0" Click="OnInfoButtonClick"/>
                     <ComboBox Name="StrideDirMode" Margin="4,0,0,0" Width="80"/>
+                    <Button Content="Add Shader Dirs" Margin="4,0,0,0" Click="OnAddDirsButtonClick"/>
+                    <Button Content="Info" Margin="4,0,0,0" Click="OnInfoButtonClick"/>
                     <TextBox Text="{Binding Path, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Delay=1000}"
                              ToolTip="Enter the path to a Stride installation"
                              BorderThickness="0"
