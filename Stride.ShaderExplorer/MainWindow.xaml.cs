@@ -72,7 +72,11 @@ namespace StrideShaderExplorer
             var shader = (ShaderViewModel)e.NewValue;
 
             if (shader != null)
+            {
                 codeView.Text = shader.Text;
+                BaseShaders.ItemsSource = shader.BaseShaders.Select(s => s.Name);
+                BaseShaders.SelectedIndex = 0;
+            }
         }
 
         private void OnExpandAllButtonClick(object sender, RoutedEventArgs e)
