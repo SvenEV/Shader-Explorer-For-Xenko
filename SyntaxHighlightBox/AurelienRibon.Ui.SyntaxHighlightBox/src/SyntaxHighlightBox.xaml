@@ -9,7 +9,7 @@
 			<Setter Property="AcceptsTab" Value="True" />
 			<Setter Property="HorizontalScrollBarVisibility" Value="Auto" />
 			<Setter Property="VerticalScrollBarVisibility" Value="Auto" />
-			<Setter Property="FontFamily" Value="Courier New" />
+			<Setter Property="FontFamily" Value="Consolas" />
 			<Setter Property="FontSize" Value="9pt" />
 		</Style>
 	</TextBox.Style>
