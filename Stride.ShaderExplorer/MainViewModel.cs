@@ -1,4 +1,5 @@
 ﻿using GalaSoft.MvvmLight;
+using Stride.ShaderParser;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -34,12 +35,12 @@ namespace StrideShaderExplorer
         /// The list of roots of the tree view. This includes all the shaders
         /// that do not inherit from any other shaders.
         /// </summary>
-        public List<Shader> RootShaders { get; set; }
+        public List<ShaderViewModel> RootShaders { get; set; }
 
         /// <summary>
         /// The list of all shaders.
         /// </summary>
-        public IEnumerable<Shader> AllShaders => ShadersInPostOrder();
+        public IEnumerable<ShaderViewModel> AllShaders => ShadersInPostOrder();
 
         public string FilterText
         {
@@ -168,14 +169,14 @@ namespace StrideShaderExplorer
                 shader.IsExpanded = expand;
         }
 
-        private IEnumerable<Shader> ShadersInPostOrder()
+        private IEnumerable<ShaderViewModel> ShadersInPostOrder()
         {
             foreach (var rootShader in RootShaders)
                 foreach (var shader in ShadersInPostOrder(rootShader))
                     yield return shader;
         }
 
-        private static IEnumerable<Shader> ShadersInPostOrder(Shader shader)
+        private static IEnumerable<ShaderViewModel> ShadersInPostOrder(ShaderViewModel shader)
         {
             foreach (var child in shader.DerivedShaders)
                 foreach (var s in ShadersInPostOrder(child))
@@ -183,58 +184,46 @@ namespace StrideShaderExplorer
             yield return shader;
         }
 
-        private IEnumerable<Shader> BuildShaderTree()
+        private IEnumerable<ShaderViewModel> BuildShaderTree()
         {
-            var files = Paths.Where(p => p != null && Directory.Exists(p))
+            var files = Paths.Where(p => !string.IsNullOrWhiteSpace(p) && Directory.Exists(p))
                 .SelectMany(path => Directory.GetFiles(path, "*.sdsl", SearchOption.AllDirectories));
-            var shaders = new Dictionary<string, Shader>();
+            var shaders = new Dictionary<string, ShaderViewModel>();
+            var duplicates = new Dictionary<string, ShaderViewModel>();
 
             foreach (var file in files)
             {
-                var name = System.IO.Path.GetFileNameWithoutExtension(file);
+                var name = Path.GetFileNameWithoutExtension(file);
                 if(!shaders.ContainsKey(name))
-                    shaders[name] = new Shader { Path = file, Name = name };
+                    shaders[name] = new ShaderViewModel { Path = file, Name = name };
+                else
+                    duplicates[name] = new ShaderViewModel { Path = file, Name = name };
             }
 
             foreach (var shader in shaders.Values)
             {
-                var declaration = string.Join(" ", File.ReadLines(shader.Path)
-                    .SkipWhile(s => !s.Trim().Contains("shader ") && !s.Trim().Contains("class ")) // From "shader" or "class"
-                    .TakeWhile(s => !s.Contains("{"))); // To the bracket (exclusive)
-
-                if (declaration != null)
+                if (EffectUtils.TryParseEffect(shader.Name, shaders, out var parsedShader))
                 {
-                    var colonIndex = declaration.IndexOf(':');
+                    var baseShaderNames = parsedShader.BaseShaders.Select(s => s.ShaderClass.Name.Text).ToList();
+                    System.Diagnostics.Debug.WriteLine(string.Join(", ", baseShaderNames));
+                    if (baseShaderNames.Count > 0)
+                    { 
+                        var baseShaders = baseShaderNames
+                            .Select(s => shaders.TryGetValue(s, out var b) ? b : null)
+                            .Where(s => s != null);
 
-                    if (colonIndex != -1)
-                    {
-                        var baseShaderDeclaration = declaration.Substring(colonIndex + 1);
-                        baseShaderDeclaration = Regex.Replace(baseShaderDeclaration, @"\<[\w\s\.\,]*\>", "");
-                        baseShaderDeclaration = Regex.Replace(baseShaderDeclaration, "//.*", "");
-
-                        var baseShaderNames = baseShaderDeclaration
-                            .Split(',')
-                            .Select(s => s.Trim());
-                        System.Diagnostics.Debug.WriteLine(string.Join(", ", baseShaderNames));
-                        if (!baseShaderNames.Contains("ShadowMapCasterBase"))
-                        { //I have no clue why this shader doesn't exist. >w>
-
-                            // There are shaders deriving from "ShadowMapCasterBase" which for some reason doesn't exit,
-                            // so this base shader is filtered out via TryGetValue(...) == false.
-                            var baseShaders = baseShaderNames
-                                .Select(s => shaders.TryGetValue(s, out var b) ? b : null)
-                                .Where(s => s != null);
-
-                            foreach (var baseShader in baseShaders)
-                            {
-                                shader.BaseShaders.Add(baseShader);
-                                baseShader.DerivedShaders.Add(shader);
-                            }
+                        foreach (var baseShader in baseShaders)
+                        {
+                            shader.BaseShaders.Add(baseShader);
+                            baseShader.DerivedShaders.Add(shader);
                         }
                     }
                     else
+                    {
                         yield return shader;
+                    }
                 }
+                
             }
 
             Debug.WriteLine($"Found {shaders.Count} shaders");

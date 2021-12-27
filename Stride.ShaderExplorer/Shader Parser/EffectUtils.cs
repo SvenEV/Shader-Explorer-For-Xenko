@@ -17,6 +17,7 @@ using System.Reflection;
 using System.Diagnostics;
 using Stride.Core;
 using Stride.Shaders.Parser.Mixins;
+using StrideShaderExplorer;
 
 namespace Stride.ShaderParser
 {
@@ -134,12 +135,12 @@ namespace Stride.ShaderParser
             return name;
         }
 
-        public static bool TryParseEffect(this IVirtualFileProvider fileProvider, string effectName, ShaderSourceManager shaderSourceManager, out ParsedShader result)
+        public static bool TryParseEffect(string shaderName, Dictionary<string, ShaderViewModel> shaders, out ParsedShader result)
         {
             result = null;
 
             var resultRef = new ParsedShaderRef();
-            var success = TryParseEffect(effectName, fileProvider, shaderSourceManager, resultRef);
+            var success = TryParseEffect(shaderName, shaders, resultRef);
             Debug.Assert(resultRef.ParentShaders.Count == 0);
             if (success)
                 result = resultRef.ParsedShader;
@@ -164,7 +165,7 @@ namespace Stride.ShaderParser
             }
         }
 
-        public static bool TryParseEffect(string shaderName, IVirtualFileProvider fileProvider, ShaderSourceManager shaderSourceManager, ParsedShaderRef resultRef)
+        private static bool TryParseEffect(string shaderName, Dictionary<string, ShaderViewModel> shaders, ParsedShaderRef resultRef)
         {
             lock (parserCacheLock)
             {
@@ -201,7 +202,7 @@ namespace Stride.ShaderParser
                     };
 
                     // get source code
-                    var code = GetShaderSourceCode(shaderName, fileProvider, shaderSourceManager);
+                    var code = File.ReadAllText(shaders[shaderName].Path);
                     var inputFileName = shaderName + ".sdsl";
 
                     var parsingResult = StrideShaderParser.TryPreProcessAndParse(code, inputFileName, macros);
@@ -231,7 +232,7 @@ namespace Stride.ShaderParser
                             foreach (var baseClass in baseShaders)
                             {
                                 var baseShaderName = baseClass.Name.Text;
-                                TryParseEffect(baseShaderName, fileProvider, shaderSourceManager, resultRef);
+                                TryParseEffect(baseShaderName, shaders, resultRef);
                             }
                         }
                         finally

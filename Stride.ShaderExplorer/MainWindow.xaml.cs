@@ -30,7 +30,7 @@ namespace StrideShaderExplorer
 
         private void TreeView_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
-            var shader = (Shader)e.NewValue;
+            var shader = (ShaderViewModel)e.NewValue;
 
             if (shader != null)
                 codeView.Text = File.ReadAllText(shader.Path);

@@ -1,11 +1,12 @@
 ﻿using GalaSoft.MvvmLight;
+using Stride.ShaderParser;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 
 namespace StrideShaderExplorer
 {
-    public class Shader : ObservableObject
+    public class ShaderViewModel : ObservableObject
     {
         private bool _isExpanded = false;
         private bool _isVisible = true;
@@ -26,9 +27,11 @@ namespace StrideShaderExplorer
 
         public string Path { get; set; }
 
-        public List<Shader> DerivedShaders { get; } = new List<Shader>();
+        public ParsedShader ParsedShader { get; set; }
 
-        public List<Shader> BaseShaders { get; } = new List<Shader>();
+        public List<ShaderViewModel> DerivedShaders { get; } = new List<ShaderViewModel>();
+
+        public List<ShaderViewModel> BaseShaders { get; } = new List<ShaderViewModel>();
 
         public override string ToString() => ToString(0);
 
