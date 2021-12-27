@@ -20,6 +20,45 @@ namespace StrideShaderExplorer
             StrideDirMode.ItemsSource = Enum.GetValues(typeof(StrideSourceDirMode)).Cast<StrideSourceDirMode>();
             StrideDirMode.SelectedIndex = 0;
             StrideDirMode.SelectionChanged += StrideDirMode_SelectionChanged;
+
+            codeView.SelectionChanged += CodeView_SelectionChanged;
+        }
+
+        private void CodeView_SelectionChanged(object sender, RoutedEventArgs e)
+        {
+            var length = codeView.Text.Length;
+
+            if (length < 1)
+                return;
+
+            var start = codeView.CaretIndex;
+            var end = codeView.CaretIndex;
+
+            while (start >= 0 && start < length)
+            {
+                if (IsBorderChar(codeView.Text[start]))
+                {
+                    start++;
+                    break;
+                }
+
+                start--;
+            }
+
+            while (end >= 0 && end < (length - 1))
+            {
+                if (IsBorderChar(codeView.Text[end]))
+                    break;
+                end++;
+            }
+
+            var word = codeView.Text.Substring(Math.Max(start, 0), Math.Max(end - start, 0));
+
+            if (!string.IsNullOrWhiteSpace(word))
+                ViewModel.SelectedWord = word;
+
+            bool IsBorderChar(char c)
+                => !(c == '_' || char.IsLetterOrDigit(c));
         }
 
         private void StrideDirMode_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
@@ -33,7 +72,7 @@ namespace StrideShaderExplorer
             var shader = (ShaderViewModel)e.NewValue;
 
             if (shader != null)
-                codeView.Text = File.ReadAllText(shader.Path);
+                codeView.Text = shader.Text;
         }
 
         private void OnExpandAllButtonClick(object sender, RoutedEventArgs e)

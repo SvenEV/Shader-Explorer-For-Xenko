@@ -3,9 +3,9 @@
 <Syntax name="SDSL">
   <HighlightWordsRule name="Reserved language words">
     <Words>
-      shader class stage cbuffer abs attribute case constant if else elsif for
+      shader class stage cbuffer abs attribute case constant if else elsif for foreach
       not null params return stream streams while static const internal abstract
-      override var partial effect mixin macro compose namespace nointerpolation base rgroup typedef
+      override var partial effect mixin child macro compose namespace nointerpolation base rgroup typedef
       switch default struct in out inout using export extern precise shared groupshared uniform volatile
       globallycoherent linear centroid noperspective sample
     </Words>

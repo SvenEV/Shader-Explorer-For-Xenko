@@ -2,6 +2,7 @@
 using Stride.ShaderParser;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.IO;
 using System.Linq;
 
 namespace StrideShaderExplorer
@@ -26,6 +27,20 @@ namespace StrideShaderExplorer
         public string Name { get; set; }
 
         public string Path { get; set; }
+
+        string text;
+        public string Text
+        {
+            get
+            {
+                if (text == null)
+                {
+                    text = File.ReadAllText(Path);
+                }
+
+                return text;
+            }
+        }
 
         public ParsedShader ParsedShader { get; set; }
 

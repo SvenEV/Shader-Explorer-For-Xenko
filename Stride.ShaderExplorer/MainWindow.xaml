@@ -75,13 +75,14 @@
             <GridSplitter Grid.Column="1" Grid.RowSpan="99" HorizontalAlignment="Stretch"
                           Background="#FF434343"/>
 
-            <TextBlock Grid.Column="1" Grid.RowSpan="99" Foreground="White"
-                       Text=". . ." TextWrapping="Wrap" TextTrimming="CharacterEllipsis"
-                       HorizontalAlignment="Center" VerticalAlignment="Center"
-                       IsHitTestVisible="False"/>
+            <StackPanel Grid.Row="0" Grid.Column="2" Margin="0,0,0,2" Orientation="Horizontal">
+                <Button Content="Expand all" Click="OnExpandAllButtonClick"/>
+                <Button Content="Collapse all" Margin="4,0,0,0" Click="OnCollapseAllButtonClick"/>
+                <TextBlock IsManipulationEnabled="false" Padding="4,1"  Background="White" FontFamily="Consolas" FontSize="10pt" Text="{Binding SelectedWord, UpdateSourceTrigger=PropertyChanged, Delay=500}" />
+            </StackPanel>
 
             <!-- Code view -->
-            <ScrollViewer Grid.Column="2" Grid.RowSpan="99"
+            <ScrollViewer Grid.Row="1" Grid.Column="2" Grid.RowSpan="99"
                           HorizontalScrollBarVisibility="Auto"
                           VerticalScrollBarVisibility="Auto">
                 <shb:SyntaxHighlightBox x:Name="codeView" IsReadOnly="True" IsReadOnlyCaretVisible="True"/>

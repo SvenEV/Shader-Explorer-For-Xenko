@@ -23,6 +23,7 @@ namespace StrideShaderExplorer
         private const string NugetEnvironmentVariable = "NUGET_PACKAGES";
 
         private string _filterText;
+        private string _selectedWord;
         private IReadOnlyList<string> _paths;
 
         public List<string> AdditionalPaths
@@ -49,6 +50,17 @@ namespace StrideShaderExplorer
             {
                 if (Set(ref _filterText, value))
                     UpdateFiltering();
+            }
+        }
+
+        public string SelectedWord
+        {
+            get { return _selectedWord; }
+            set
+            {
+                if (Set(ref _selectedWord, value))
+                {
+                }
             }
         }
 

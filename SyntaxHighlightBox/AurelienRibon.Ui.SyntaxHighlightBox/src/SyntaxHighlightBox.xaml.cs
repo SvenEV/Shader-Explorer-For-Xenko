@@ -43,6 +43,9 @@ namespace AurelienRibon.Ui.SyntaxHighlightBox
             }
         }
 
+        public IReadOnlyList<InnerTextBlock> TextBlocks => blocks;
+        public int TotalLineCount => totalLineCount;
+
         public IHighlighter CurrentHighlighter { get; set; }
 
         private DrawingControl renderCanvas;
@@ -94,6 +97,12 @@ namespace AurelienRibon.Ui.SyntaxHighlightBox
                 UpdateTotalLineCount();
                 InvalidateBlocks(e.Changes.First().Offset);
                 InvalidateVisual();
+            };
+
+            PreviewMouseUp += (s, e) =>
+            {
+                var sen = e.Source;
+                //this.CaretIndex
             };
         }
 
@@ -394,7 +403,7 @@ namespace AurelienRibon.Ui.SyntaxHighlightBox
         // Classes
         // -----------------------------------------------------------
 
-        private class InnerTextBlock
+        public class InnerTextBlock
         {
             public string RawText { get; set; }
             public FormattedText FormattedText { get; set; }
