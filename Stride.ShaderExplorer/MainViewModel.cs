@@ -1,4 +1,5 @@
 ﻿using GalaSoft.MvvmLight;
+using Stride.Core.Shaders.Ast;
 using Stride.ShaderParser;
 using System;
 using System.Collections.Generic;
@@ -30,6 +31,47 @@ namespace StrideShaderExplorer
         {
             get;
             set;
+        }
+
+        public Dictionary<string, ShaderViewModel> shaders = new Dictionary<string, ShaderViewModel>();
+        public Dictionary<string, List<ShaderViewModel>> variables = new Dictionary<string, List<ShaderViewModel>>();
+        public Dictionary<string, List<ShaderViewModel>> methods = new Dictionary<string, List<ShaderViewModel>>();
+        public Dictionary<string, ShaderViewModel> ShaderMap => shaders;
+        public Dictionary<string, List<ShaderViewModel>> VariableMap => variables;
+        public Dictionary<string, List<ShaderViewModel>> MethodMap => methods;
+
+        public bool FindVariable(string name, out Variable v)
+        {
+            v = null;
+            var result = variables.TryGetValue(name, out var sdrs);
+
+            if (result)
+            {
+                var shader = sdrs.FirstOrDefault();
+                if (shader != null)
+                {
+                    v = shader.ParsedShader.Variables.FirstOrDefault(v => v.Name.Text == name);
+                }
+            }
+
+            return result;
+        }
+
+        public bool FindMethod(string name, out MethodDeclaration m)
+        {
+            m = null;
+            var result = methods.TryGetValue(name, out var sdrs);
+
+            if (result)
+            {
+                var shader = sdrs.FirstOrDefault();
+                if (shader != null)
+                {
+                    m = shader.ParsedShader.Methods.FirstOrDefault(v => v.Name.Text == name);
+                }
+            }
+
+            return result;
         }
 
         /// <summary>
@@ -127,7 +169,7 @@ namespace StrideShaderExplorer
 
         internal void SaveUserSetting()
         {
-            Properties.UserSettings.Default.AdditionalPaths = string.Join(";", AdditionalPaths);
+            Properties.UserSettings.Default.AdditionalPaths = string.Join(";", AdditionalPaths.Where(p => p != "New path..."));
             Properties.UserSettings.Default.Save();
         }
 
@@ -162,6 +204,7 @@ namespace StrideShaderExplorer
         public MainViewModel()
         {
             AdditionalPaths = Properties.UserSettings.Default.AdditionalPaths.Split(';').ToList();
+            AdditionalPaths.Add("New path...");
             Refresh();
         }
 
@@ -200,7 +243,8 @@ namespace StrideShaderExplorer
         {
             var files = Paths.Where(p => !string.IsNullOrWhiteSpace(p) && Directory.Exists(p))
                 .SelectMany(path => Directory.GetFiles(path, "*.sdsl", SearchOption.AllDirectories));
-            var shaders = new Dictionary<string, ShaderViewModel>();
+
+            shaders.Clear();
             var duplicates = new Dictionary<string, ShaderViewModel>();
 
             foreach (var file in files)
@@ -217,7 +261,30 @@ namespace StrideShaderExplorer
                 if (EffectUtils.TryParseEffect(shader.Name, shaders, out var parsedShader))
                 {
                     var baseShaderNames = parsedShader.BaseShaders.Select(s => s.ShaderClass.Name.Text).ToList();
-                    System.Diagnostics.Debug.WriteLine(string.Join(", ", baseShaderNames));
+                    shader.ParsedShader = parsedShader;
+
+                    foreach (var v in parsedShader.Variables)
+                    {
+                        var vn = v.Name.Text;
+                        if (string.IsNullOrWhiteSpace(vn) || !variables.TryGetValue(vn, out var sdrs))
+                        {
+                            sdrs = new List<ShaderViewModel>();
+                        }
+                        sdrs.Add(shader);
+                        variables[vn] = sdrs;
+                    }
+
+                    foreach (var m in parsedShader.Methods)
+                    {
+                        var mn = m.Name.Text;
+                        if (string.IsNullOrWhiteSpace(mn) || !methods.TryGetValue(mn, out var sdrs))
+                        {
+                            sdrs = new List<ShaderViewModel>();
+                        }
+                        sdrs.Add(shader);
+                        methods[mn] = sdrs;
+                    }
+
                     if (baseShaderNames.Count > 0)
                     { 
                         var baseShaders = baseShaderNames

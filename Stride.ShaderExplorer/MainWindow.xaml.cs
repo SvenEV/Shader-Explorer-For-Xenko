@@ -1,9 +1,12 @@
 ﻿using AurelienRibon.Ui.SyntaxHighlightBox;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Input;
 
 namespace StrideShaderExplorer
 {
@@ -22,6 +25,88 @@ namespace StrideShaderExplorer
             StrideDirMode.SelectionChanged += StrideDirMode_SelectionChanged;
 
             codeView.SelectionChanged += CodeView_SelectionChanged;
+            BaseShaders.SelectionChanged += BaseShaders_SelectionChanged;
+            MouseDown += MainWindow_MouseDown;
+        }
+
+        private void MainWindow_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            switch (e.ChangedButton)
+            {
+                case MouseButton.XButton1://Back button
+                    Back();
+                    break;
+                case MouseButton.XButton2://forward button
+                    Forward();
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        private void BaseShaders_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            var s = BaseShaders.SelectedItem as string;
+            if (s != null && ViewModel.ShaderMap.TryGetValue(s, out var shader))
+            {
+                SetShaderCode(shader);
+                forwardStack.Push(s);
+            }
+        }
+
+        private void SetShaderCode(ShaderViewModel shader, bool isNavigation = false)
+        {
+            if (shader != null)
+            {
+                codeView.Text = shader.Text;
+                BaseShaders.ItemsSource = shader.BaseShaders.Select(s => s.Name);
+                BaseShaders.SelectedItem = null;
+
+                if (!isNavigation)
+                {
+                    backStack.Push(shader.Name);
+                    BackButton.IsEnabled = backStack.Count > 1;
+                    forwardStack.Clear();
+                    ForwardButton.IsEnabled = false;
+                }
+            }
+
+        }
+
+        Stack<string> backStack = new Stack<string>();
+        Stack<string> forwardStack = new Stack<string>();
+
+        public void Back()
+        {
+            if (backStack.Count < 2)
+                return;
+
+            var s = backStack.Pop();
+            var l = backStack.Peek();
+            BackButton.IsEnabled = backStack.Count > 1;
+
+            if (ViewModel.ShaderMap.TryGetValue(l, out var shader))
+            {
+                SetShaderCode(shader, isNavigation: true);
+                forwardStack.Push(s);
+                ForwardButton.IsEnabled = true;
+            }
+        }
+
+        public void Forward()
+        {
+            if (forwardStack.Count < 1)
+                return;
+
+            var s = forwardStack.Pop();
+            ForwardButton.IsEnabled = forwardStack.Count > 0;
+
+            if (ViewModel.ShaderMap.TryGetValue(s, out var shader))
+            {
+                SetShaderCode(shader, isNavigation: true);
+                backStack.Push(s);
+                BackButton.IsEnabled = true;
+            }
         }
 
         private void CodeView_SelectionChanged(object sender, RoutedEventArgs e)
@@ -69,14 +154,7 @@ namespace StrideShaderExplorer
 
         private void TreeView_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
-            var shader = (ShaderViewModel)e.NewValue;
-
-            if (shader != null)
-            {
-                codeView.Text = shader.Text;
-                BaseShaders.ItemsSource = shader.BaseShaders.Select(s => s.Name);
-                BaseShaders.SelectedIndex = 0;
-            }
+            SetShaderCode(e.NewValue as ShaderViewModel);
         }
 
         private void OnExpandAllButtonClick(object sender, RoutedEventArgs e)
@@ -92,6 +170,35 @@ namespace StrideShaderExplorer
         private void OnInfoButtonClick(object sender, RoutedEventArgs e)
         {
             new InfoWindow().ShowDialog();
+        }
+
+        private void OnBackButtonClick(object sender, RoutedEventArgs e)
+        {
+            Back();
+        }
+
+        private void OnForwardButtonClick(object sender, RoutedEventArgs e)
+        {
+            Forward();
+        }
+
+        private void OnExploreButtonClick(object sender, RoutedEventArgs e)
+        {
+            if (backStack.Count > 0 && ViewModel.ShaderMap.TryGetValue(backStack.Peek(), out var shader))
+            {
+                // suppose that we have a test.txt at E:\
+                string filePath = shader.Path;
+                if (!File.Exists(filePath))
+                {
+                    return;
+                }
+
+                // combine the arguments together
+                // it doesn't matter if there is a space after ','
+                var argument = "/select, \"" + filePath + "\"";
+
+                System.Diagnostics.Process.Start("explorer.exe", argument);
+            }
         }
 
         private void OnAddDirsButtonClick(object sender, RoutedEventArgs e)

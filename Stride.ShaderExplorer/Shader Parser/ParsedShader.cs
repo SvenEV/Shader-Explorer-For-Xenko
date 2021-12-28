@@ -33,6 +33,7 @@ namespace Stride.ShaderParser
         Lazy<IReadOnlyDictionary<string, CompositionInput>> compositionsWithBaseShaders;
 
         public readonly IReadOnlyList<Variable> Variables;
+        public readonly IReadOnlyList<MethodDeclaration> Methods;
         public readonly IReadOnlyDictionary<string, Variable> VariablesByName;
 
         private IEnumerable<CompositionInput> GetCompositionsWithBaseShaders()
@@ -55,7 +56,8 @@ namespace Stride.ShaderParser
         {
             Shader = shader;
             ShaderClass = Shader.GetFirstClassDecl();
-            Variables = ShaderClass?.Members.OfType<Variable>().Where(v => !v.Qualifiers.Contains(StrideStorageQualifier.Stream)).ToList() ?? new List<Variable>(); //should include parent shaders?
+            Variables = ShaderClass?.Members.OfType<Variable>().ToList() ?? new List<Variable>();
+            Methods = ShaderClass?.Members.OfType<MethodDeclaration>().ToList() ?? new List<MethodDeclaration>();
             VariablesByName = Variables.ToDictionary(v => v.Name.Text);
             compositions = Variables
                 .Select((v, i) => (v, i))
