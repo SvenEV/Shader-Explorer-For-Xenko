@@ -26,11 +26,14 @@
   <ItemGroup>
     <PackageReference Include="CommonServiceLocator" Version="2.0.6" />
     <PackageReference Include="Microsoft.Toolkit.Mvvm" Version="7.1.2" />
-    <PackageReference Include="Stride.Engine" Version="4.0.1.1428" />
+    <PackageReference Include="Stride.Shaders.Parser" Version="4.0.1.1428" />
     <!--<PackageReference Include="Stride.Core.Assets.CompilerApp" Version="4.0.1.1428" IncludeAssets="build;buildTransitive" />-->
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\SyntaxHighlightBox\AurelienRibon.Ui.SyntaxHighlightBox\AurelienRibon.Ui.SyntaxHighlightBox.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="System.Windows.Forms" />
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Assets\StrideShaderExplorerLogo.ico">

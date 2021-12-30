@@ -17,7 +17,7 @@
     <TextBox.Template>
         <ControlTemplate TargetType="{x:Type local:SyntaxHighlightBox}">
             <!--Visual-->
-            <Border Background="White" BorderThickness="{TemplateBinding BorderThickness}"
+            <Border Background="#1e1e1e" BorderThickness="{TemplateBinding BorderThickness}"
                     BorderBrush="{TemplateBinding BorderBrush}">
                 <Grid>
                     <Grid.ColumnDefinitions>

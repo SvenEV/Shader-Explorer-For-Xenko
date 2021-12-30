@@ -4,14 +4,12 @@ using Stride.Core.Shaders.Ast.Hlsl;
 using Stride.Core.Shaders.Ast.Stride;
 using Stride.Graphics;
 using Stride.Rendering;
-using Stride.Rendering.Materials;
 using Stride.Shaders;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Buffer = Stride.Graphics.Buffer;
 
 namespace Stride.ShaderParser
 {
@@ -73,66 +71,6 @@ namespace Stride.ShaderParser
             if (!baseShaders.Contains(baseShader))
                 baseShaders.Add(baseShader);
 
-        }
-
-        public IEnumerable<ParameterKey> GetUniformInputs()
-        {
-            foreach (var v in Variables)
-            {
-                var type = v.Type;
-                var keyName = ShaderClass.Name + "." + v.Name;
-
-                switch (type)
-                {
-                    case ScalarType s when s.Name.Text == "float":
-                        yield return ParameterKeys.NewValue(v.GetDefault<float>(), keyName);
-                        break;
-                    case ScalarType s when s.Name.Text == "int":
-                        yield return ParameterKeys.NewValue(v.GetDefault<int>(), keyName);
-                        break;
-                    case ScalarType s when s.Name.Text == "uint":
-                        yield return ParameterKeys.NewValue(v.GetDefault<uint>(), keyName);
-                        break;
-                    case ScalarType s when s.Name.Text == "bool":
-                        yield return ParameterKeys.NewValue(v.GetDefault<bool>(), keyName);
-                        break;
-                    case TypeName n when n.Name.Text == "float2":
-                        yield return ParameterKeys.NewValue(v.GetDefault<Vector2>(), keyName);
-                        break;
-                    case TypeName n when n.Name.Text == "float3":
-                        yield return ParameterKeys.NewValue(v.GetDefault<Vector3>(), keyName);
-                        break;
-                    case TypeName n when n.Name.Text == "float4":
-                        yield return ParameterKeys.NewValue(v.GetDefault<Vector4>(), keyName);
-                        break;
-                    case TypeName m when m.Name.Text == "float4x4":
-                        yield return ParameterKeys.NewValue(Matrix.Identity, keyName);
-                        break;
-                    case TypeName s when s.Name.Text == "int2":
-                        yield return ParameterKeys.NewValue(v.GetDefault<Int2>(), keyName);
-                        break;
-                    case TypeName s when s.Name.Text == "int3":
-                        yield return ParameterKeys.NewValue(v.GetDefault<Int3>(), keyName);
-                        break;
-                    case TypeName s when s.Name.Text == "int4":
-                        yield return ParameterKeys.NewValue(v.GetDefault<Int4>(), keyName);
-                        break;
-                    case TextureType t:
-                        yield return new ObjectParameterKey<Texture>(keyName);
-                        break;
-                    case ObjectType o when o.Name.Text == "SamplerState":
-                        yield return new ObjectParameterKey<SamplerState>(keyName);
-                        break;
-                    case GenericType b when b.Name.Text.Contains("Buffer"):
-                        yield return new ObjectParameterKey<Buffer>(keyName);
-                        break;
-                    case GenericType t when t.Name.Text.Contains("Texture"):
-                        yield return new ObjectParameterKey<Texture>(keyName);
-                        break;
-                    default:
-                        break;
-                }
-            }
         }
 
         public override string ToString()

@@ -10,7 +10,7 @@
       globallycoherent linear centroid noperspective sample
     </Words>
     <IgnoreCase>false</IgnoreCase>
-    <Foreground>#0000FF</Foreground>
+    <Foreground>#569cd6</Foreground>
     <FontWeight>Normal</FontWeight>
     <FontStyle>Normal</FontStyle>
   </HighlightWordsRule>
@@ -24,7 +24,7 @@
       float float2 float2x2 float3 float3x3 float4 float4x4
     </Words>
     <IgnoreCase>false</IgnoreCase>
-    <Foreground>#0000FF</Foreground>
+    <Foreground>#569cd6</Foreground>
     <FontWeight>Normal</FontWeight>
     <FontStyle>Normal</FontStyle>
   </HighlightWordsRule>
@@ -112,7 +112,7 @@
       GatherRed GatherGreen GatherBlue GatherAlpha GatherCmp GatherCmpRed GatherCmpGreen GatherCmpBlue GatherCmpAlpha
     </Words>
     <IgnoreCase>false</IgnoreCase>
-    <Foreground>#000000</Foreground>
+    <Foreground>#d4d4d4</Foreground>
     <FontWeight>Bold</FontWeight>
     <FontStyle>Normal</FontStyle>
   </HighlightWordsRule>

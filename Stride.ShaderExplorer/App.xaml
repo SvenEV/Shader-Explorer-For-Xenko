@@ -5,13 +5,37 @@
              StartupUri="MainWindow.xaml">
     <Application.Resources>
 
-        <local:BoolToBrushConverter x:Key="BoolToBrush" TrueBrush="Black" FalseBrush="#44000000"/>
+        <local:BoolToBrushConverter x:Key="BoolToBrush" TrueBrush="#d4d4d4" FalseBrush="#33d4d4d4"/>
 
         <Style TargetType="Button">
             <Setter Property="Background" Value="#FF900520"/>
-            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="Foreground" Value="#d4d4d4"/>
             <Setter Property="BorderThickness" Value="0"/>
             <Setter Property="Padding" Value="4,2"/>
+        </Style>
+
+        <Style TargetType="ListBox">
+            <Setter Property="Background" Value="#1e1e1e"/>
+            <Setter Property="Foreground" Value="#d4d4d4"/>
+            <Setter Property="BorderThickness" Value="1"/>
+        </Style>
+
+        <Style TargetType="TreeView">
+            <Setter Property="Background" Value="#1e1e1e"/>
+            <Setter Property="Foreground" Value="#d4d4d4"/>
+            <Setter Property="BorderThickness" Value="1"/>
+        </Style>
+
+        <Style TargetType="TreeViewItem">
+            <Setter Property="Background" Value="#FF434343"/>
+            <Setter Property="Foreground" Value="#d4d4d4"/>
+            <Setter Property="BorderThickness" Value="1"/>
+        </Style>
+
+        <Style TargetType="CheckBox">
+            <Setter Property="Background" Value="#FF434343"/>
+            <Setter Property="Foreground" Value="#d4d4d4"/>
+            <Setter Property="BorderThickness" Value="1"/>
         </Style>
 
         <Style TargetType="Hyperlink">

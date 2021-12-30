@@ -334,7 +334,7 @@ namespace AurelienRibon.Ui.SyntaxHighlightBox
                 FlowDirection.LeftToRight,
                 new Typeface(FontFamily, FontStyle, FontWeight, FontStretch),
                 FontSize,
-                Brushes.Black);
+                new SolidColorBrush(Color.FromRgb(212, 212, 212)));
 
             ft.Trimming = TextTrimming.None;
             ft.LineHeight = lineHeight;
