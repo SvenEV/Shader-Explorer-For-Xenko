@@ -1,5 +1,6 @@
 ﻿using AurelienRibon.Ui.SyntaxHighlightBox;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -25,11 +26,13 @@ namespace StrideShaderExplorer
             StrideDirMode.SelectionChanged += StrideDirMode_SelectionChanged;
 
             codeView.SelectionChanged += CodeView_SelectionChanged;
-            BaseShaders.SelectionChanged += BaseShaders_SelectionChanged;
-            MouseDown += MainWindow_MouseDown;
+            BaseShaders.SelectionChanged += Shaders_SelectionChanged;
+            DerivedShaders.SelectionChanged += Shaders_SelectionChanged;
+            MemberShaders.SelectionChanged += Shaders_SelectionChanged;
+            PreviewMouseDown += MainWindow_PreviewMouseDown;
         }
 
-        private void MainWindow_MouseDown(object sender, MouseButtonEventArgs e)
+        private void MainWindow_PreviewMouseDown(object sender, MouseButtonEventArgs e)
         {
             switch (e.ChangedButton)
             {
@@ -44,12 +47,16 @@ namespace StrideShaderExplorer
             }
         }
 
-        private void BaseShaders_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private void Shaders_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            var s = BaseShaders.SelectedItem as string;
-            if (s != null && ViewModel.ShaderMap.TryGetValue(s, out var shader))
+            NavigateToShader(e.AddedItems.OfType<ShaderViewModel>().FirstOrDefault());
+        }
+       
+        private void NavigateToShader(ShaderViewModel s)
+        {
+            if (s != null)
             {
-                SetShaderCode(shader);
+                SetShaderCode(s);
                 forwardStack.Push(s);
             }
         }
@@ -58,13 +65,11 @@ namespace StrideShaderExplorer
         {
             if (shader != null)
             {
-                codeView.Text = shader.Text;
-                BaseShaders.ItemsSource = shader.BaseShaders.Select(s => s.Name);
-                BaseShaders.SelectedItem = null;
+                ViewModel.SelectedShader = shader;
 
                 if (!isNavigation)
                 {
-                    backStack.Push(shader.Name);
+                    backStack.Push(shader);
                     BackButton.IsEnabled = backStack.Count > 1;
                     forwardStack.Clear();
                     ForwardButton.IsEnabled = false;
@@ -73,8 +78,8 @@ namespace StrideShaderExplorer
 
         }
 
-        Stack<string> backStack = new Stack<string>();
-        Stack<string> forwardStack = new Stack<string>();
+        Stack<ShaderViewModel> backStack = new Stack<ShaderViewModel>();
+        Stack<ShaderViewModel> forwardStack = new Stack<ShaderViewModel>();
 
         public void Back()
         {
@@ -85,9 +90,9 @@ namespace StrideShaderExplorer
             var l = backStack.Peek();
             BackButton.IsEnabled = backStack.Count > 1;
 
-            if (ViewModel.ShaderMap.TryGetValue(l, out var shader))
+            if (l != null)
             {
-                SetShaderCode(shader, isNavigation: true);
+                SetShaderCode(l, isNavigation: true);
                 forwardStack.Push(s);
                 ForwardButton.IsEnabled = true;
             }
@@ -101,9 +106,9 @@ namespace StrideShaderExplorer
             var s = forwardStack.Pop();
             ForwardButton.IsEnabled = forwardStack.Count > 0;
 
-            if (ViewModel.ShaderMap.TryGetValue(s, out var shader))
+            if (s != null)
             {
-                SetShaderCode(shader, isNavigation: true);
+                SetShaderCode(s, isNavigation: true);
                 backStack.Push(s);
                 BackButton.IsEnabled = true;
             }
@@ -140,7 +145,13 @@ namespace StrideShaderExplorer
             var word = codeView.Text.Substring(Math.Max(start, 0), Math.Max(end - start, 0));
 
             if (!string.IsNullOrWhiteSpace(word))
-                ViewModel.SelectedWord = word;
+            {
+                if (ViewModel.FindMember(word, ViewModel.SelectedShader, out var member, out var scopedShaders))
+                {
+                    ViewModel.SelectedShader.SelectedMember = member;
+                    ViewModel.SelectedShader.ScopedShaders = scopedShaders;
+                }
+            }
 
             bool IsBorderChar(char c)
                 => !(c == '_' || char.IsLetterOrDigit(c));
@@ -184,10 +195,10 @@ namespace StrideShaderExplorer
 
         private void OnExploreButtonClick(object sender, RoutedEventArgs e)
         {
-            if (backStack.Count > 0 && ViewModel.ShaderMap.TryGetValue(backStack.Peek(), out var shader))
+            if (backStack.Count > 0)
             {
                 // suppose that we have a test.txt at E:\
-                string filePath = shader.Path;
+                string filePath = backStack.Peek()?.Path;
                 if (!File.Exists(filePath))
                 {
                     return;

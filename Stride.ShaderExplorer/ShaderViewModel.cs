@@ -1,4 +1,4 @@
-﻿using GalaSoft.MvvmLight;
+﻿using Microsoft.Toolkit.Mvvm.ComponentModel;
 using Stride.ShaderParser;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -11,17 +11,18 @@ namespace StrideShaderExplorer
     {
         private bool _isExpanded = false;
         private bool _isVisible = true;
+        private MemberViewModel _selectedMember;
 
         public bool IsExpanded
         {
             get { return _isExpanded; }
-            set { Set(ref _isExpanded, value); }
+            set { SetProperty(ref _isExpanded, value); }
         }
 
         public bool IsVisible
         {
             get { return _isVisible; }
-            set { Set(ref _isVisible, value); }
+            set { SetProperty(ref _isVisible, value); }
         }
 
         public string Name { get; set; }
@@ -47,6 +48,31 @@ namespace StrideShaderExplorer
         public List<ShaderViewModel> DerivedShaders { get; } = new List<ShaderViewModel>();
 
         public List<ShaderViewModel> BaseShaders { get; } = new List<ShaderViewModel>();
+
+        public List<ShaderViewModel> TreeViewChildren { get; } = new List<ShaderViewModel>();
+
+        public MemberViewModel SelectedMember
+        {
+            get { return _selectedMember; }
+            set
+            {
+                if (SetProperty(_selectedMember, value, v => _selectedMember = v))
+                {
+                }
+            }
+        }
+
+        List<ShaderViewModel> _scopedShaders;
+        public List<ShaderViewModel> ScopedShaders
+        {
+            get { return _scopedShaders; }
+            set
+            {
+                if (SetProperty(_scopedShaders, value, v => _scopedShaders = v))
+                {
+                }
+            }
+        }
 
         public override string ToString() => ToString(0);
 

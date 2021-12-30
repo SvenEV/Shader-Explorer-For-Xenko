@@ -25,7 +25,7 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="CommonServiceLocator" Version="2.0.6" />
-    <PackageReference Include="MvvmLightLibs" Version="5.4.1.1" />
+    <PackageReference Include="Microsoft.Toolkit.Mvvm" Version="7.1.2" />
     <PackageReference Include="Stride.Engine" Version="4.0.1.1428" />
     <!--<PackageReference Include="Stride.Core.Assets.CompilerApp" Version="4.0.1.1428" IncludeAssets="build;buildTransitive" />-->
   </ItemGroup>

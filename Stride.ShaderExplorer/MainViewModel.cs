@@ -1,4 +1,4 @@
-﻿using GalaSoft.MvvmLight;
+﻿using Microsoft.Toolkit.Mvvm.ComponentModel;
 using Stride.Core.Shaders.Ast;
 using Stride.ShaderParser;
 using System;
@@ -18,13 +18,14 @@ namespace StrideShaderExplorer
         Dev
     }
 
-    public class MainViewModel : ViewModelBase
+    public class MainViewModel : ObservableRecipient
     {
         private const string StrideEnvironmentVariable = "StrideDir";
         private const string NugetEnvironmentVariable = "NUGET_PACKAGES";
 
         private string _filterText;
-        private string _selectedWord;
+        private bool _directParentsOnly = true;
+        private ShaderViewModel _selectedShader;
         private IReadOnlyList<string> _paths;
 
         public List<string> AdditionalPaths
@@ -34,40 +35,32 @@ namespace StrideShaderExplorer
         }
 
         public Dictionary<string, ShaderViewModel> shaders = new Dictionary<string, ShaderViewModel>();
-        public Dictionary<string, List<ShaderViewModel>> variables = new Dictionary<string, List<ShaderViewModel>>();
-        public Dictionary<string, List<ShaderViewModel>> methods = new Dictionary<string, List<ShaderViewModel>>();
+        public Dictionary<string, MemberViewModel> members = new Dictionary<string, MemberViewModel>();
         public Dictionary<string, ShaderViewModel> ShaderMap => shaders;
-        public Dictionary<string, List<ShaderViewModel>> VariableMap => variables;
-        public Dictionary<string, List<ShaderViewModel>> MethodMap => methods;
 
-        public bool FindVariable(string name, out Variable v)
+        public bool FindMember(string name, ShaderViewModel shader, out MemberViewModel member, out List<ShaderViewModel> scopedShaders)
         {
-            v = null;
-            var result = variables.TryGetValue(name, out var sdrs);
+            scopedShaders = null;
+            var result = members.TryGetValue(name, out member);
 
             if (result)
             {
-                var shader = sdrs.FirstOrDefault();
-                if (shader != null)
+                //find base shaders that defines the member, could be multiple for method overrides
+                scopedShaders = new List<ShaderViewModel>();
+                foreach (var baseShader in shader.BaseShaders)
                 {
-                    v = shader.ParsedShader.Variables.FirstOrDefault(v => v.Name.Text == name);
+                    if (member.DeclaringShaders.Contains(baseShader))
+                    {
+                        scopedShaders.Add(baseShader);
+                    }
                 }
-            }
 
-            return result;
-        }
-
-        public bool FindMethod(string name, out MethodDeclaration m)
-        {
-            m = null;
-            var result = methods.TryGetValue(name, out var sdrs);
-
-            if (result)
-            {
-                var shader = sdrs.FirstOrDefault();
-                if (shader != null)
+                foreach (var derivedShader in shader.DerivedShaders)
                 {
-                    m = shader.ParsedShader.Methods.FirstOrDefault(v => v.Name.Text == name);
+                    if (member.DeclaringShaders.Contains(derivedShader))
+                    {
+                        scopedShaders.Add(derivedShader);
+                    }
                 }
             }
 
@@ -90,17 +83,27 @@ namespace StrideShaderExplorer
             get { return _filterText; }
             set
             {
-                if (Set(ref _filterText, value))
+                if (SetProperty(ref _filterText, value))
                     UpdateFiltering();
             }
         }
 
-        public string SelectedWord
+        public bool DirectParentsOnly
         {
-            get { return _selectedWord; }
+            get { return _directParentsOnly; }
             set
             {
-                if (Set(ref _selectedWord, value))
+                if (SetProperty(ref _directParentsOnly, value))
+                    Refresh();
+            }
+        }
+
+        public ShaderViewModel SelectedShader
+        {
+            get { return _selectedShader; }
+            set
+            {
+                if (SetProperty(_selectedShader, value, v => _selectedShader = v))
                 {
                 }
             }
@@ -181,13 +184,16 @@ namespace StrideShaderExplorer
             get { return _paths; }
             set
             {
-                if (Set(ref _paths, value))
+                if (SetProperty(ref _paths, value))
                 {
                     try
                     {
                         RootShaders = BuildShaderTree().OrderBy(s => s.Name, StringComparer.OrdinalIgnoreCase).ToList();
-                        RaisePropertyChanged(nameof(RootShaders));
-                        RaisePropertyChanged(nameof(AllShaders));
+                        OnPropertyChanged(nameof(RootShaders));
+                        OnPropertyChanged(nameof(AllShaders));
+                        //Broadcast(oldValue, newValue, nameof(MyProperty));
+                        //RaisePropertyChanged();
+                        //RaisePropertyChanged();
                         UpdateFiltering();
                         ExpandAll(false);
                     }
@@ -263,26 +269,22 @@ namespace StrideShaderExplorer
                     var baseShaderNames = parsedShader.BaseShaders.Select(s => s.ShaderClass.Name.Text).ToList();
                     shader.ParsedShader = parsedShader;
 
-                    foreach (var v in parsedShader.Variables)
-                    {
-                        var vn = v.Name.Text;
-                        if (string.IsNullOrWhiteSpace(vn) || !variables.TryGetValue(vn, out var sdrs))
-                        {
-                            sdrs = new List<ShaderViewModel>();
-                        }
-                        sdrs.Add(shader);
-                        variables[vn] = sdrs;
-                    }
-
-                    foreach (var m in parsedShader.Methods)
+                    // get all declrarations in this shader
+                    foreach (var m in parsedShader.ShaderClass.Members.OfType<IDeclaration>() ?? Enumerable.Empty<IDeclaration>())
                     {
                         var mn = m.Name.Text;
-                        if (string.IsNullOrWhiteSpace(mn) || !methods.TryGetValue(mn, out var sdrs))
+                        if (string.IsNullOrWhiteSpace(mn))
                         {
-                            sdrs = new List<ShaderViewModel>();
+                            continue;
                         }
-                        sdrs.Add(shader);
-                        methods[mn] = sdrs;
+
+                        if (!members.TryGetValue(mn, out var member))
+                        {
+                            member = new MemberViewModel(mn, m);
+                        }
+
+                        member.DeclaringShaders.Add(shader);
+                        members[mn] = member;
                     }
 
                     if (baseShaderNames.Count > 0)
@@ -295,6 +297,17 @@ namespace StrideShaderExplorer
                         {
                             shader.BaseShaders.Add(baseShader);
                             baseShader.DerivedShaders.Add(shader);
+                            if (_directParentsOnly)
+                            {
+                                if (parsedShader.ShaderClass.BaseClasses.FirstOrDefault(bc => bc.Name.Text == baseShader.Name) != null)
+                                {
+                                    baseShader.TreeViewChildren.Add(shader);
+                                }
+                            }
+                            else
+                            {
+                                baseShader.TreeViewChildren.Add(shader);
+                            }
                         }
                     }
                     else

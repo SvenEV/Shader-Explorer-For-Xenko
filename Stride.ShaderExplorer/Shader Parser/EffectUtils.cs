@@ -207,7 +207,7 @@ namespace Stride.ShaderParser
 
                     var parsingResult = StrideShaderParser.TryPreProcessAndParse(code, inputFileName, macros);
 
-                    if (parsingResult.HasErrors)
+                    if (parsingResult.HasErrors || parsingResult.Shader.GetFirstClassDecl() == null)
                     {
                         return false;
                     }
