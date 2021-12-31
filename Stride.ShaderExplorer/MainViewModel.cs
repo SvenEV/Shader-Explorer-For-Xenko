@@ -35,29 +35,45 @@ namespace StrideShaderExplorer
         }
 
         public Dictionary<string, ShaderViewModel> shaders = new Dictionary<string, ShaderViewModel>();
-        public Dictionary<string, MemberViewModel> members = new Dictionary<string, MemberViewModel>();
+        public Dictionary<string, Dictionary<ShaderViewModel, MemberList>> members = new Dictionary<string, Dictionary<ShaderViewModel, MemberList>>();
         public Dictionary<string, ShaderViewModel> ShaderMap => shaders;
 
-        public bool FindMember(string name, ShaderViewModel shader, out MemberViewModel member, out List<ShaderViewModel> scopedShaders)
+        public bool FindMember(string name, ShaderViewModel shader, out MemberList mems, out List<ShaderViewModel> scopedShaders)
         {
+            mems = null;
             scopedShaders = null;
-            var result = members.TryGetValue(name, out member);
+            var result = members.TryGetValue(name, out var memberCandidates);
 
             if (result)
             {
+                // defined locally?
+                if (memberCandidates.TryGetValue(shader, out mems)) 
+                {
+
+                }
+
                 //find base shaders that defines the member, could be multiple for method overrides
                 scopedShaders = new List<ShaderViewModel>();
+                var definingShader = shader;
                 foreach (var baseShader in shader.BaseShaders)
                 {
-                    if (member.DeclaringShaders.Contains(baseShader))
+
+                    if (memberCandidates.TryGetValue(baseShader, out var ms))
                     {
+                        //find highest definition in hierarchy
+                        if (definingShader.BaseShaders.Contains(baseShader))
+                        {
+                            mems = ms;
+                        }
+
                         scopedShaders.Add(baseShader);
                     }
                 }
 
+                //also add derived shaders
                 foreach (var derivedShader in shader.DerivedShaders)
                 {
-                    if (member.DeclaringShaders.Contains(derivedShader))
+                    if (memberCandidates.TryGetValue(derivedShader, out var _))
                     {
                         scopedShaders.Add(derivedShader);
                     }
@@ -194,9 +210,6 @@ namespace StrideShaderExplorer
                         RootShaders = BuildShaderTree().OrderBy(s => s.Name, StringComparer.OrdinalIgnoreCase).ToList();
                         OnPropertyChanged(nameof(RootShaders));
                         OnPropertyChanged(nameof(AllShaders));
-                        //Broadcast(oldValue, newValue, nameof(MyProperty));
-                        //RaisePropertyChanged();
-                        //RaisePropertyChanged();
                         UpdateFiltering();
                         ExpandAll(false);
                     }
@@ -281,13 +294,20 @@ namespace StrideShaderExplorer
                             continue;
                         }
 
-                        if (!members.TryGetValue(mn, out var member))
+                        if (!members.TryGetValue(mn, out var memberCandidates))
                         {
-                            member = new MemberViewModel(mn, m);
+                            memberCandidates = new Dictionary<ShaderViewModel, MemberList>();
                         }
 
-                        member.DeclaringShaders.Add(shader);
-                        members[mn] = member;
+                        if (!memberCandidates.TryGetValue(shader, out var mems))
+                        {
+                            mems = new MemberList();
+                        }
+
+                        mems.Add(new MemberViewModel(mn, m));
+
+                        memberCandidates[shader] = mems;
+                        members[mn] = memberCandidates;
                     }
 
                     if (baseShaderNames.Count > 0)

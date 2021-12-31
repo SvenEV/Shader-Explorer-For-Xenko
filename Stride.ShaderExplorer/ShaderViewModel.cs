@@ -11,7 +11,7 @@ namespace StrideShaderExplorer
     {
         private bool _isExpanded = false;
         private bool _isVisible = true;
-        private MemberViewModel _selectedMember;
+        private MemberList _selectedMember;
 
         public bool IsExpanded
         {
@@ -51,7 +51,7 @@ namespace StrideShaderExplorer
 
         public List<ShaderViewModel> TreeViewChildren { get; } = new List<ShaderViewModel>();
 
-        public MemberViewModel SelectedMember
+        public MemberList SelectedMember
         {
             get { return _selectedMember; }
             set

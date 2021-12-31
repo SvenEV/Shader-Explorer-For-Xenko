@@ -147,9 +147,9 @@ namespace StrideShaderExplorer
 
             if (!string.IsNullOrWhiteSpace(word))
             {
-                if (ViewModel.FindMember(word, ViewModel.SelectedShader, out var member, out var scopedShaders))
+                if (ViewModel.FindMember(word, ViewModel.SelectedShader, out var mems, out var scopedShaders))
                 {
-                    ViewModel.SelectedShader.SelectedMember = member;
+                    ViewModel.SelectedShader.SelectedMember = mems;
                     ViewModel.SelectedShader.ScopedShaders = scopedShaders;
                 }
             }

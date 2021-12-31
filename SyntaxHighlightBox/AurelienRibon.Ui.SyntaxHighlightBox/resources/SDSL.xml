@@ -112,7 +112,7 @@
       GatherRed GatherGreen GatherBlue GatherAlpha GatherCmp GatherCmpRed GatherCmpGreen GatherCmpBlue GatherCmpAlpha
     </Words>
     <IgnoreCase>false</IgnoreCase>
-    <Foreground>#d4d4d4</Foreground>
+    <Foreground>#dcdcaa</Foreground>
     <FontWeight>Bold</FontWeight>
     <FontStyle>Normal</FontStyle>
   </HighlightWordsRule>
@@ -120,7 +120,7 @@
   <HighlightLineRule name="Comments">
     <LineStart>//</LineStart>
     <IgnoreCase>false</IgnoreCase>
-    <Foreground>#009933</Foreground>
+    <Foreground>#6a9955</Foreground>
     <FontWeight>Normal</FontWeight>
     <FontStyle>Normal</FontStyle>
   </HighlightLineRule>
@@ -128,7 +128,7 @@
   <AdvancedHighlightRule name="Numbers">
     <Expression>\b([0-9]*\.?[0-9]+f?)\b</Expression>
     <IgnoreCase>false</IgnoreCase>
-    <Foreground>#F68A1B</Foreground>
+    <Foreground>#b5cea8</Foreground>
     <FontWeight>Normal</FontWeight>
     <FontStyle>Normal</FontStyle>
   </AdvancedHighlightRule>
@@ -136,7 +136,7 @@
   <AdvancedHighlightRule name="MultilineComments">
     <Expression>\/\*[^*]*\*+(?:[^/*][^*]*\*+)*\/</Expression>
     <IgnoreCase>false</IgnoreCase>
-    <Foreground>#009933</Foreground>
+    <Foreground>#6a9955</Foreground>
     <FontWeight>Normal</FontWeight>
     <FontStyle>Normal</FontStyle>
   </AdvancedHighlightRule>

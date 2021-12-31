@@ -3,7 +3,7 @@ using Stride.Core.Shaders.Ast;
 using Stride.ShaderParser;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.IO;
+using System;
 using System.Linq;
 
 namespace StrideShaderExplorer
@@ -32,5 +32,14 @@ namespace StrideShaderExplorer
         {
             return Member.ToString();
         }
+    }
+
+    public class MemberList : List<MemberViewModel>
+    {
+        public MemberList() : base(1)
+        { }
+
+        public string AsString 
+            => string.Join(Environment.NewLine, this.Select(m => m.ToString()));
     }
 }

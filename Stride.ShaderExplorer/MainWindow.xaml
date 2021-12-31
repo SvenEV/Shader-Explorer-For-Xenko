@@ -103,8 +103,8 @@
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="1*" />
-                <ColumnDefinition Width="8" />
-                <ColumnDefinition Width="3*" />
+                <ColumnDefinition Width="4" />
+                <ColumnDefinition Width="4*" />
             </Grid.ColumnDefinitions>
 
             <!--  TreeView  -->
@@ -152,7 +152,8 @@
             <!--  Code view  -->
             <Grid Grid.Row="0" Grid.Column="2">
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="3*" />
+                    <ColumnDefinition Width="4*" />
+                    <ColumnDefinition Width="4" />
                     <ColumnDefinition Width="1*" />
                 </Grid.ColumnDefinitions>
 
@@ -167,11 +168,17 @@
                         IsReadOnlyCaretVisible="True"
                         Text="{Binding Path=SelectedShader.Text, Mode=OneWay}" />
                 </ScrollViewer>
-                <Grid Grid.Column="1">
+                <!--  Grid splitter  -->
+                <GridSplitter
+                Grid.RowSpan="99"
+                Grid.Column="1"
+                HorizontalAlignment="Stretch"
+                Background="#FF434343" />
+                <Grid Grid.Column="2">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="1*" />
                         <RowDefinition Height="1*" />
-                        <RowDefinition Height="28" />
+                        <RowDefinition Height="auto" />
                         <RowDefinition Height="1*" />
                     </Grid.RowDefinitions>
                     <ListBox
@@ -189,10 +196,10 @@
                         x:Name="memberView"
                         Grid.Row="2"
                         BorderBrush="#292929"
+                        IsLineNumbersMarginVisible="False"
                         IsReadOnly="True"
                         IsReadOnlyCaretVisible="False"
-                        IsLineNumbersMarginVisible="False"
-                        Text="{Binding Path=SelectedShader.SelectedMember, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, Delay=500}" />
+                        Text="{Binding Path=SelectedShader.SelectedMember.AsString, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, Delay=500}" />
 
                     <ListBox
                         x:Name="MemberShaders"
