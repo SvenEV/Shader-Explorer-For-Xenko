@@ -125,18 +125,18 @@
     <FontStyle>Normal</FontStyle>
   </HighlightLineRule>
 
-  <AdvancedHighlightRule name="MultilineComments">
-    <Expression>\/\*[^*]*\*+(?:[^/*][^*]*\*+)*\/</Expression>
-    <IgnoreCase>false</IgnoreCase>
-    <Foreground>#009933</Foreground>
-    <FontWeight>Normal</FontWeight>
-    <FontStyle>Normal</FontStyle>
-  </AdvancedHighlightRule>
-
   <AdvancedHighlightRule name="Numbers">
     <Expression>\b([0-9]*\.?[0-9]+f?)\b</Expression>
     <IgnoreCase>false</IgnoreCase>
     <Foreground>#F68A1B</Foreground>
+    <FontWeight>Normal</FontWeight>
+    <FontStyle>Normal</FontStyle>
+  </AdvancedHighlightRule>
+
+  <AdvancedHighlightRule name="MultilineComments">
+    <Expression>\/\*[^*]*\*+(?:[^/*][^*]*\*+)*\/</Expression>
+    <IgnoreCase>false</IgnoreCase>
+    <Foreground>#009933</Foreground>
     <FontWeight>Normal</FontWeight>
     <FontStyle>Normal</FontStyle>
   </AdvancedHighlightRule>

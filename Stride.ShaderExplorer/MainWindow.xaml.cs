@@ -21,6 +21,7 @@ namespace StrideShaderExplorer
             DataContext = ViewModel;
             Title = "Shader Explorer for Stride " + Assembly.GetEntryAssembly().GetName().Version;
             codeView.CurrentHighlighter = HighlighterManager.Instance.Highlighters["SDSL"];
+            memberView.CurrentHighlighter = HighlighterManager.Instance.Highlighters["SDSL"];
             StrideDirMode.ItemsSource = Enum.GetValues(typeof(StrideSourceDirMode)).Cast<StrideSourceDirMode>();
             StrideDirMode.SelectedIndex = 0;
             StrideDirMode.SelectionChanged += StrideDirMode_SelectionChanged;

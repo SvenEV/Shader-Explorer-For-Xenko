@@ -160,7 +160,10 @@ namespace StrideShaderExplorer
                         break;
                 }
 
-                paths.AddRange(AdditionalPaths);
+                if (paths != null)
+                    paths.AddRange(AdditionalPaths);
+                else
+                    paths = AdditionalPaths;
 
                 Paths = paths;
             }

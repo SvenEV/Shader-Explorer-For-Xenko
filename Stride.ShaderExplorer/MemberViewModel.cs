@@ -27,5 +27,10 @@ namespace StrideShaderExplorer
         public bool IsMethod => Member is MethodDeclaration;
 
         public IDeclaration Member { get; }
+
+        public override string ToString()
+        {
+            return Member.ToString();
+        }
     }
 }
